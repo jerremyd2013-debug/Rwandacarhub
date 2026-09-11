@@ -1,0 +1,6 @@
+{
+  "name": "RwandaCarHub",
+  "description": "Rwanda's trusted automotive marketplace in Kigali for buying, selling, renting, and leasing verified vehicles with transparent pricing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
