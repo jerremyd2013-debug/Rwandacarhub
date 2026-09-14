@@ -521,7 +521,7 @@ export default function App() {
   }, [vehicles]);
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col selection:bg-red-700 selection:text-white font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-transparent text-slate-900 flex flex-col selection:bg-sky-600 selection:text-white font-['Plus_Jakarta_Sans',sans-serif]">
       {/* GLOBAL HEADER */}
       <Header
         currentTab={currentTab}
@@ -625,58 +625,58 @@ export default function App() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div 
                   onClick={() => handleTabSelect('buy')}
-                  className="p-4 sm:p-5 rounded-2xl bg-neutral-900/80 border border-neutral-800 hover:border-red-800/80 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md"
+                  className="p-4 sm:p-5 rounded-2xl bg-white/85 backdrop-blur-md border border-sky-200 hover:border-sky-400 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md hover:shadow-lg"
                 >
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-900/40 text-red-400 flex items-center justify-center border border-red-800/50 group-hover:bg-red-700 group-hover:text-white transition-colors">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center border border-sky-200 group-hover:bg-sky-600 group-hover:text-white transition-colors">
                     <Car className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-white font-['Outfit',sans-serif]">Buy Certified Cars</h3>
-                  <p className="text-[11px] sm:text-xs text-neutral-400 line-clamp-1">Verified Japanese & European stock</p>
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-['Outfit',sans-serif]">Buy Certified Cars</h3>
+                  <p className="text-[11px] sm:text-xs text-sky-800/80 line-clamp-1 font-medium">Verified Japanese & European stock</p>
                 </div>
 
                 <div 
                   onClick={() => handleTabSelect('sell')}
-                  className="p-4 sm:p-5 rounded-2xl bg-neutral-900/80 border border-neutral-800 hover:border-red-800/80 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md"
+                  className="p-4 sm:p-5 rounded-2xl bg-white/85 backdrop-blur-md border border-sky-200 hover:border-emerald-400 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md hover:shadow-lg"
                 >
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center border border-emerald-800/50 group-hover:bg-emerald-700 group-hover:text-white transition-colors">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center border border-emerald-200 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                     <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-white font-['Outfit',sans-serif]">Sell Your Car</h3>
-                  <p className="text-[11px] sm:text-xs text-neutral-400 line-clamp-1">Direct buyer contacts in Kigali</p>
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-['Outfit',sans-serif]">Sell Your Car</h3>
+                  <p className="text-[11px] sm:text-xs text-sky-800/80 line-clamp-1 font-medium">Direct buyer contacts in Kigali</p>
                 </div>
 
                 <div 
                   onClick={() => handleTabSelect('rent')}
-                  className="p-4 sm:p-5 rounded-2xl bg-neutral-900/80 border border-neutral-800 hover:border-red-800/80 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md"
+                  className="p-4 sm:p-5 rounded-2xl bg-white/85 backdrop-blur-md border border-sky-200 hover:border-amber-400 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md hover:shadow-lg"
                 >
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-900/40 text-amber-400 flex items-center justify-center border border-amber-800/50 group-hover:bg-amber-700 group-hover:text-white transition-colors">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center border border-amber-200 group-hover:bg-amber-600 group-hover:text-white transition-colors">
                     <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-white font-['Outfit',sans-serif]">Rent 4x4 Vehicles</h3>
-                  <p className="text-[11px] sm:text-xs text-neutral-400 line-clamp-1">Prado & Land Cruisers for travel</p>
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-['Outfit',sans-serif]">Rent 4x4 Vehicles</h3>
+                  <p className="text-[11px] sm:text-xs text-sky-800/80 line-clamp-1 font-medium">Prado & Land Cruisers for travel</p>
                 </div>
 
                 <div 
                   onClick={() => handleTabSelect('services')}
-                  className="p-4 sm:p-5 rounded-2xl bg-neutral-900/80 border border-neutral-800 hover:border-red-800/80 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md"
+                  className="p-4 sm:p-5 rounded-2xl bg-white/85 backdrop-blur-md border border-sky-200 hover:border-indigo-400 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md hover:shadow-lg"
                 >
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-900/40 text-indigo-400 flex items-center justify-center border border-indigo-800/50 group-hover:bg-indigo-700 group-hover:text-white transition-colors">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center border border-indigo-200 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                     <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-white font-['Outfit',sans-serif]">Car Valuation & Check</h3>
-                  <p className="text-[11px] sm:text-xs text-neutral-400 line-clamp-1">Instant valuation & 150-point inspection</p>
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-['Outfit',sans-serif]">Car Valuation & Check</h3>
+                  <p className="text-[11px] sm:text-xs text-sky-800/80 line-clamp-1 font-medium">Instant valuation & 150-point inspection</p>
                 </div>
               </div>
             </div>
 
             {/* UNIFIED CLEAR VEHICLES MARKETPLACE SECTION */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-800 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-400/40 pb-4">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-black text-white font-['Outfit',sans-serif]">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-950 font-['Outfit',sans-serif]">
                     Available Vehicles in Rwanda
                   </h2>
-                  <p className="text-xs text-neutral-400">
+                  <p className="text-xs text-sky-950/80 font-medium">
                     Showing {filteredVehicles.length} verified vehicle{filteredVehicles.length > 1 ? 's' : ''} ready in Kigali
                   </p>
                 </div>
@@ -687,8 +687,8 @@ export default function App() {
                     onClick={() => setFilters((prev) => ({ ...prev, purpose: 'all' }))}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       filters.purpose === 'all'
-                        ? 'bg-red-800 text-white shadow-sm'
-                        : 'bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800'
+                        ? 'bg-sky-600 text-white shadow-sm'
+                        : 'bg-white/85 text-sky-900 hover:bg-white border border-sky-200'
                     }`}
                   >
                     All ({vehicles.length})
@@ -697,8 +697,8 @@ export default function App() {
                     onClick={() => setFilters((prev) => ({ ...prev, purpose: 'buy' }))}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       filters.purpose === 'buy'
-                        ? 'bg-red-800 text-white shadow-sm'
-                        : 'bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800'
+                        ? 'bg-sky-600 text-white shadow-sm'
+                        : 'bg-white/85 text-sky-900 hover:bg-white border border-sky-200'
                     }`}
                   >
                     Buy
@@ -708,7 +708,7 @@ export default function App() {
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       filters.purpose === 'rent'
                         ? 'bg-amber-600 text-white shadow-sm'
-                        : 'bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800'
+                        : 'bg-white/85 text-sky-900 hover:bg-white border border-sky-200'
                     }`}
                   >
                     Rent
@@ -717,8 +717,8 @@ export default function App() {
                     onClick={() => setFilters((prev) => ({ ...prev, purpose: 'lease' }))}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       filters.purpose === 'lease'
-                        ? 'bg-indigo-700 text-white shadow-sm'
-                        : 'bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800'
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'bg-white/85 text-sky-900 hover:bg-white border border-sky-200'
                     }`}
                   >
                     Lease
@@ -727,15 +727,15 @@ export default function App() {
               </div>
 
               {filteredVehicles.length === 0 ? (
-                <div className="p-12 text-center bg-neutral-900 rounded-2xl border border-neutral-800 space-y-3">
-                  <Car className="w-12 h-12 text-neutral-600 mx-auto" />
-                  <h4 className="text-base font-bold text-white">No vehicles match your selected filters.</h4>
-                  <p className="text-xs text-neutral-400">
+                <div className="p-12 text-center bg-white/85 backdrop-blur-md rounded-2xl border border-sky-200 space-y-3 shadow-md">
+                  <Car className="w-12 h-12 text-sky-600 mx-auto" />
+                  <h4 className="text-base font-bold text-slate-900">No vehicles match your selected filters.</h4>
+                  <p className="text-xs text-sky-800 font-medium">
                     Try clearing or widening your search criteria to find more cars.
                   </p>
                   <button
                     onClick={() => setFilters(initialFilters)}
-                    className="px-4 py-2 rounded-xl bg-red-700 text-white text-xs font-bold"
+                    className="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold shadow-md"
                   >
                     Reset All Filters
                   </button>
@@ -793,15 +793,15 @@ export default function App() {
         {(currentTab === 'buy' || currentTab === 'rent' || currentTab === 'lease') && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/80 border border-red-800/60 text-xs font-bold text-red-300">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/85 backdrop-blur-md border border-sky-200 text-xs font-bold text-sky-800 shadow-sm">
                 {currentTab === 'buy' ? '🚗 For Sale in Rwanda' : currentTab === 'rent' ? '🔑 Rental & Safari Fleet' : '📄 Corporate & Long-term Lease'}
               </div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-['Outfit',sans-serif]">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-950 font-['Outfit',sans-serif]">
                 {currentTab === 'buy' && 'Buy Certified Vehicles in Kigali'}
                 {currentTab === 'rent' && 'Car Hire & Safari 4x4 Rental in Rwanda'}
                 {currentTab === 'lease' && 'Long-term Corporate Vehicle Leasing'}
               </h1>
-              <p className="text-xs sm:text-sm text-neutral-400 max-w-3xl">
+              <p className="text-xs sm:text-sm text-sky-950/80 max-w-3xl font-medium">
                 {currentTab === 'buy' && 'Explore verified foreign imports and clean local Rwandan cars with full RRA paperwork and mechanical inspection reports.'}
                 {currentTab === 'rent' && 'Explore Rwanda with confidence. Toyota Prado, Land Cruiser 70-series, RAV4, and luxury sedans with optional driver.'}
                 {currentTab === 'lease' && 'Tailored automotive leasing solutions for NGOs, embassies, corporate executives, and business fleets in Kigali.'}
@@ -819,18 +819,18 @@ export default function App() {
 
             {/* Filtered Vehicles Grid */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs text-neutral-400">
+              <div className="flex items-center justify-between text-xs text-sky-950/80 font-medium">
                 <span>Showing <strong>{filteredVehicles.length}</strong> available listings</span>
                 <span>Watermark Protection: <strong>www.rwandacarhub.com</strong></span>
               </div>
 
               {filteredVehicles.length === 0 ? (
-                <div className="p-12 text-center bg-neutral-900 rounded-2xl border border-neutral-800 space-y-3">
-                  <Car className="w-12 h-12 text-neutral-600 mx-auto" />
-                  <h4 className="text-base font-bold text-white">No cars found matching this criteria.</h4>
+                <div className="p-12 text-center bg-white/85 backdrop-blur-md rounded-2xl border border-sky-200 space-y-3 shadow-md">
+                  <Car className="w-12 h-12 text-sky-600 mx-auto" />
+                  <h4 className="text-base font-bold text-slate-900">No cars found matching this criteria.</h4>
                   <button
                     onClick={() => setFilters(initialFilters)}
-                    className="px-4 py-2 rounded-xl bg-red-700 text-white text-xs font-bold"
+                    className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md"
                   >
                     Reset Filters
                   </button>
@@ -910,10 +910,10 @@ export default function App() {
             {/* PRICING PACKAGES DETAIL */}
             <div className="space-y-6">
               <div className="text-center max-w-xl mx-auto">
-                <h3 className="text-2xl font-bold text-white font-['Outfit',sans-serif]">
+                <h3 className="text-2xl font-bold text-slate-950 font-['Outfit',sans-serif]">
                   Choose Your Listing Plan
                 </h3>
-                <p className="text-xs text-neutral-400 mt-1">
+                <p className="text-xs text-sky-950/80 mt-1 font-medium">
                   Simple, honest pricing with instant Mobile Money (*182#) payment integration, plus a free tier for account holders.
                 </p>
               </div>

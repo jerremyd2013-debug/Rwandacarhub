@@ -65,16 +65,16 @@ export const DealersView: React.FC<DealersViewProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       {/* HEADER HERO */}
-      <div className="bg-neutral-900 rounded-2xl p-6 sm:p-10 border border-neutral-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl">
+      <div className="bg-white/85 backdrop-blur-md rounded-2xl p-6 sm:p-10 border border-sky-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
         <div className="space-y-2 max-w-2xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-950/80 border border-red-800/60 text-xs font-semibold text-red-300">
-            <ShieldCheck className="w-3.5 h-3.5 text-red-400" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 border border-sky-200 text-xs font-semibold text-sky-800">
+            <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
             <span>Certified Dealership Directory</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-['Outfit',sans-serif]">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-950 font-['Outfit',sans-serif]">
             Verified Car Dealers in Kigali
           </h2>
-          <p className="text-sm text-neutral-400 leading-relaxed">
+          <p className="text-sm text-sky-950/80 leading-relaxed font-medium">
             Connect directly with reputable automotive showrooms in Kicukiro, Gasabo, and Nyarugenge. Every dealer is RDB-registered and thoroughly audited by RwandaCarHub.
           </p>
         </div>

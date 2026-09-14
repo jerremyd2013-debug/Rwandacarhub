@@ -61,14 +61,14 @@ export const CarServicesView: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12">
       {/* HEADER HERO */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-950/80 border border-red-800/60 text-xs font-semibold text-red-300">
-          <Sparkles className="w-3.5 h-3.5 text-red-400" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/85 backdrop-blur-md border border-sky-200 text-xs font-semibold text-sky-800 shadow-sm">
+          <Sparkles className="w-3.5 h-3.5 text-sky-600" />
           <span>Automotive Excellence in Rwanda</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-['Outfit',sans-serif]">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 font-['Outfit',sans-serif]">
           Professional Car Services & Valuation
         </h2>
-        <p className="text-sm text-neutral-400 leading-relaxed">
+        <p className="text-sm text-sky-950/80 leading-relaxed font-medium">
           From AI-assisted vehicle market valuation to certified mechanical pre-purchase inspections and Rwanda Revenue Authority (RRA) tax clearance advice.
         </p>
       </div>

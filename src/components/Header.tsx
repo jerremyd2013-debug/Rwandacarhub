@@ -90,9 +90,9 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-neutral-950/95 backdrop-blur-md border-b border-neutral-800 transition-all">
+    <header className="sticky top-0 z-40 w-full bg-[#0a291f]/92 backdrop-blur-md border-b border-emerald-800/40 transition-all shadow-md shadow-black/30">
       {/* TOP NOTIFICATION & ROLE SIMULATION BAR */}
-      <div className="bg-neutral-900/90 border-b border-neutral-800 text-xs text-neutral-300 py-1.5 px-3 sm:px-6">
+      <div className="bg-[#071f18]/92 border-b border-emerald-900/50 text-xs text-emerald-100/90 py-1.5 px-3 sm:px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           {/* Top Header Left: Brand info & Contact Details */}
           <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap text-neutral-300 text-[11px] sm:text-xs">

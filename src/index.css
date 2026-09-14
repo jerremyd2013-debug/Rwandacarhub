@@ -28,3 +28,32 @@
 .animate-marquee-reverse:hover {
   animation-play-state: paused;
 }
+
+/* ==========================================================
+   BLUE SKY AUTOMOTIVE SHOWROOM THEME
+   Palette: "Blue Sky & Cerulean Azure" (#38bdf8 / #0284c7)
+   - Atmospheric daytime blue sky with luminous sunlight and soft cloud glows
+   - Preserves Header and Footer in their signature emerald styling
+   ========================================================== */
+:root {
+  color-scheme: light dark;
+}
+
+html {
+  background-color: #38bdf8;
+}
+
+body {
+  background-color: #38bdf8;
+  color: #0f172a;
+  background-image: 
+    radial-gradient(ellipse 95% 45% at 50% -5%, rgba(255, 255, 255, 0.75) 0%, transparent 65%),
+    radial-gradient(ellipse 65% 30% at 15% 18%, rgba(255, 255, 255, 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 35% at 85% 25%, rgba(255, 255, 255, 0.40) 0%, transparent 50%),
+    radial-gradient(ellipse 85% 40% at 30% 60%, rgba(255, 255, 255, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 90% 45% at 70% 85%, rgba(255, 255, 255, 0.45) 0%, transparent 65%),
+    linear-gradient(180deg, #0284c7 0%, #0ea5e9 25%, #38bdf8 55%, #7dd3fc 82%, #bae6fd 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}

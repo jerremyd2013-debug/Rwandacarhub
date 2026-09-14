@@ -45,7 +45,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
     }, 100);
   };
   return (
-    <footer className="bg-neutral-950 text-neutral-300 border-t border-neutral-800 pt-16 pb-12">
+    <footer className="bg-[#061c15] text-slate-300 border-t border-emerald-900/50 pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* TOP CALLOUT: POST CAR CTA */}
         <div className="bg-gradient-to-r from-red-950/80 via-neutral-900 to-neutral-900 rounded-2xl p-6 sm:p-8 border border-red-900/50 mb-14 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">

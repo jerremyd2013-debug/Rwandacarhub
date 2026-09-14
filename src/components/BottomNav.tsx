@@ -328,7 +328,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
       {/* FIXED BOTTOM NAVIGATION BAR */}
       <nav 
         id="mobile-bottom-nav" 
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-neutral-950/95 backdrop-blur-lg border-t border-neutral-800/90 px-2 py-1.5 shadow-[0_-8px_24px_rgba(0,0,0,0.8)]"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a291f]/95 backdrop-blur-lg border-t border-emerald-800/40 px-2 py-1.5 shadow-[0_-8px_24px_rgba(0,0,0,0.8)]"
         aria-label="Mobile Bottom Navigation"
       >
         <div className="flex items-center justify-around gap-1 max-w-md mx-auto">
