@@ -139,18 +139,18 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-4xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-4xl bg-[#0f172a] border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* MODAL HEADER */}
-        <div className="px-6 py-4 bg-neutral-950 border-b border-neutral-800 flex items-center justify-between">
+        <div className="px-6 py-4 bg-[#0a0f1d] border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-red-700 flex items-center justify-center text-white">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-900/30">
               <Car className="w-4 h-4" />
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-white font-['Outfit',sans-serif]">
                 Post Your Car on RwandaCarHub
               </h3>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-slate-400">
                 Kigali & Rwanda-wide Marketplace Listings
               </p>
             </div>
@@ -158,26 +158,26 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 transition-colors"
+            className="p-2 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 text-slate-300 transition-colors border border-slate-700"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* STEP PROGRESS INDICATOR */}
-        <div className="bg-neutral-950/60 px-6 py-3 border-b border-neutral-800/80 flex items-center justify-center gap-2 sm:gap-6 text-xs font-semibold">
-          <div className={`flex items-center gap-1.5 ${step === 'plan' ? 'text-red-400 font-bold' : 'text-neutral-400'}`}>
-            <span className="w-5 h-5 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-[10px]">1</span>
+        <div className="bg-[#0a0f1d]/60 px-6 py-3 border-b border-slate-800 flex items-center justify-center gap-2 sm:gap-6 text-xs font-semibold">
+          <div className={`flex items-center gap-1.5 ${step === 'plan' ? 'text-blue-400 font-bold' : 'text-slate-400'}`}>
+            <span className="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px]">1</span>
             <span>Choose Plan</span>
           </div>
-          <span className="text-neutral-600">→</span>
-          <div className={`flex items-center gap-1.5 ${step === 'details' ? 'text-red-400 font-bold' : 'text-neutral-400'}`}>
-            <span className="w-5 h-5 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-[10px]">2</span>
+          <span className="text-slate-600">→</span>
+          <div className={`flex items-center gap-1.5 ${step === 'details' ? 'text-blue-400 font-bold' : 'text-slate-400'}`}>
+            <span className="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px]">2</span>
             <span>Car Details</span>
           </div>
-          <span className="text-neutral-600">→</span>
-          <div className={`flex items-center gap-1.5 ${step === 'payment' ? 'text-red-400 font-bold' : 'text-neutral-400'}`}>
-            <span className="w-5 h-5 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-[10px]">3</span>
+          <span className="text-slate-600">→</span>
+          <div className={`flex items-center gap-1.5 ${step === 'payment' ? 'text-blue-400 font-bold' : 'text-slate-400'}`}>
+            <span className="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px]">3</span>
             <span>{selectedPlan.priceFrw === 0 ? 'Confirmation (Free)' : 'Payment (MoMo)'}</span>
           </div>
         </div>
@@ -191,33 +191,33 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 <h4 className="text-xl font-extrabold text-white font-['Outfit',sans-serif]">
                   Select Your Listing Package
                 </h4>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-slate-400">
                   Affordable rates tailored for Kigali car owners and verified dealerships. Every car listing includes the official <strong>www.rwandacarhub.com</strong> photo watermark.
                 </p>
               </div>
 
               {/* ACCOUNT HOLDERS NOTICE BANNER */}
               {currentUser ? (
-                <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-800/80 text-xs text-emerald-200 flex items-center justify-between gap-3">
+                <div className="p-3.5 rounded-xl bg-blue-950/40 border border-blue-800/80 text-xs text-blue-200 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <UserCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <UserCheck className="w-4 h-4 text-blue-400 shrink-0" />
                     <span>Signed in as <strong>{currentUser.name}</strong> ({currentUser.email}) • You are eligible for the <strong>Free Plan (2 cars/day)</strong></span>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-900 text-emerald-300 text-[10px] font-bold shrink-0">
+                  <span className="px-2.5 py-0.5 rounded-full bg-blue-900 text-blue-300 text-[10px] font-bold shrink-0">
                     Account Active
                   </span>
                 </div>
               ) : (
-                <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 text-xs text-neutral-300 flex items-center justify-between gap-3 flex-wrap">
+                <div className="p-3.5 rounded-xl bg-[#0a0f1d] border border-slate-800 text-xs text-slate-300 flex items-center justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-yellow-400 shrink-0" />
+                    <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0" />
                     <span>Have an account? Registered members get a <strong>Free Plan (2 cars per day)</strong>!</span>
                   </div>
                   {onOpenAuthModal && (
                     <button
                       type="button"
                       onClick={onOpenAuthModal}
-                      className="px-3 py-1 rounded-lg bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 text-xs font-bold transition-colors"
+                      className="px-3 py-1 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold transition-colors"
                     >
                       Sign In / Register
                     </button>
@@ -241,19 +241,19 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                       className={`relative p-4 rounded-2xl cursor-pointer border-2 transition-all flex flex-col justify-between ${
                         isSelected 
                           ? isFree
-                            ? 'bg-emerald-950/30 border-emerald-500 shadow-xl shadow-emerald-950/50'
-                            : 'bg-red-950/40 border-red-600 shadow-xl shadow-red-950/50' 
-                          : 'bg-neutral-950 border-neutral-800 hover:border-neutral-700'
+                            ? 'bg-blue-950/40 border-blue-500 shadow-xl shadow-blue-950/50'
+                            : 'bg-blue-950/40 border-blue-500 shadow-xl shadow-blue-950/50' 
+                          : 'bg-[#0a0f1d] border-slate-800 hover:border-slate-700'
                       }`}
                     >
                       {/* BADGES */}
                       {plan.popular && (
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider shadow whitespace-nowrap">
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider shadow whitespace-nowrap">
                           Most Popular
                         </div>
                       )}
                       {isFree && (
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider shadow whitespace-nowrap">
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider shadow whitespace-nowrap">
                           Account Free Tier
                         </div>
                       )}
@@ -263,16 +263,16 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                           <h5 className="font-bold text-white text-sm font-['Outfit',sans-serif]">
                             {plan.name}
                           </h5>
-                          <span className="text-[10px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 font-semibold whitespace-nowrap shrink-0">
+                          <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold whitespace-nowrap shrink-0">
                             {plan.carLimit} Cars
                           </span>
                         </div>
 
                         <div>
-                          <div className={`text-2xl font-black font-['Outfit',sans-serif] ${isFree ? 'text-emerald-400' : 'text-white'}`}>
+                          <div className={`text-2xl font-black font-['Outfit',sans-serif] ${isFree ? 'text-blue-400' : 'text-white'}`}>
                             {isFree ? '0 Frw' : `${plan.priceFrw.toLocaleString()} Frw`}
                           </div>
-                          <p className={`text-xs font-semibold ${isFree ? 'text-emerald-400' : 'text-red-400'}`}>
+                          <p className={`text-xs font-semibold ${isFree ? 'text-blue-400' : 'text-blue-400'}`}>
                             {plan.duration}
                           </p>
                         </div>

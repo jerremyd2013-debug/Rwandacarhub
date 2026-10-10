@@ -177,15 +177,15 @@ export const PartnersAdBanner: React.FC<PartnersAdBannerProps> = ({
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setIsAdInquiryOpen(true)}
-                className="px-2.5 py-1 rounded-lg bg-red-950/70 hover:bg-red-900/80 border border-red-800/60 text-red-300 text-[10px] font-bold flex items-center gap-1 transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-blue-950/70 hover:bg-blue-900/80 border border-blue-800/60 text-blue-300 text-[10px] font-bold flex items-center gap-1 transition-colors"
                 title="Promote your business or dealership here"
               >
-                <Megaphone className="w-3 h-3 text-red-400" />
+                <Megaphone className="w-3 h-3 text-blue-400" />
                 <span>Advertise Here</span>
               </button>
               <button
                 onClick={() => setIsMinimized(true)}
-                className="w-6 h-6 rounded-md hover:bg-neutral-800 text-neutral-400 hover:text-white flex items-center justify-center transition-colors text-xs"
+                className="w-6 h-6 rounded-md hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors text-xs"
                 title="Minimize advert space"
                 aria-label="Minimize advert space"
               >
@@ -298,7 +298,7 @@ export const PartnersAdBanner: React.FC<PartnersAdBannerProps> = ({
               <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                 <button
                   onClick={() => setSelectedPartner(currentAd)}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-red-950/80 transition-all hover:scale-[1.02] whitespace-nowrap"
+                  className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-950/80 transition-all hover:scale-[1.02] whitespace-nowrap"
                 >
                   <span>{currentAd.ctaText}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -306,10 +306,10 @@ export const PartnersAdBanner: React.FC<PartnersAdBannerProps> = ({
 
                 <a
                   href={`tel:${currentAd.phone.replace(/\s+/g, '')}`}
-                  className="px-3.5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors border border-neutral-700"
+                  className="px-3.5 py-2.5 rounded-xl bg-[#0a0f1d] hover:bg-slate-800 text-slate-200 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
                   title={`Call ${currentAd.name}`}
                 >
-                  <Phone className="w-3.5 h-3.5 text-neutral-300" />
+                  <Phone className="w-3.5 h-3.5 text-blue-400" />
                   <span className="hidden sm:inline">Call</span>
                 </a>
 
@@ -319,10 +319,10 @@ export const PartnersAdBanner: React.FC<PartnersAdBannerProps> = ({
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-2.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900/90 text-emerald-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors border border-emerald-800/60"
+                  className="px-3.5 py-2.5 rounded-xl bg-blue-950/80 hover:bg-blue-900 text-blue-300 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-blue-800/60"
                   title="WhatsApp Partner"
                 >
-                  <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                  <MessageCircle className="w-3.5 h-3.5 text-blue-400" />
                   <span className="hidden sm:inline">WhatsApp</span>
                 </a>
               </div>
@@ -337,8 +337,8 @@ export const PartnersAdBanner: React.FC<PartnersAdBannerProps> = ({
                       onClick={() => setCurrentSlide(dotIdx)}
                       className={`h-1.5 rounded-full transition-all shrink-0 ${
                         dotIdx === currentSlide 
-                          ? 'w-6 bg-red-500' 
-                          : 'w-1.5 bg-neutral-700 hover:bg-neutral-500'
+                          ? 'w-6 bg-blue-500' 
+                          : 'w-1.5 bg-slate-700 hover:bg-slate-500'
                       }`}
                       aria-label={`Go to slide ${dotIdx + 1}`}
                     />

@@ -521,7 +521,7 @@ export default function App() {
   }, [vehicles]);
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-900 flex flex-col selection:bg-sky-600 selection:text-white font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-transparent text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white font-['Plus_Jakarta_Sans',sans-serif]">
       {/* GLOBAL HEADER */}
       <Header
         currentTab={currentTab}
@@ -550,7 +550,7 @@ export default function App() {
         {/* ======================= HOME VIEW ======================= */}
         {currentTab === 'home' && (
           <div className="space-y-6 sm:space-y-8 pb-16">
-            {/* MOVING & SLIDING ADVERTS AND PARTNER LINKS SPACE (BETWEEN NAVBAR AND HERO SECTION) */}
+            {/* MOVING & SLIDING ADVERTS AND PARTNER LINKS SPACE */}
             <PartnersAdBanner 
               partnerAds={partnerAds} 
               onNavigateContact={() => handleTabSelect('contact')} 
@@ -559,46 +559,42 @@ export default function App() {
 
             {/* HERO SECTION */}
             <div className="pt-1 sm:pt-2 px-3 sm:px-6 max-w-7xl mx-auto">
-              {/* HERO BANNER CONTAINER WITH VEHICLE PICTURE BEHIND TRANSPARENT BACKGROUND */}
-              <div className="relative overflow-hidden rounded-2xl sm:rounded-[2.5rem] border border-neutral-800/90 shadow-2xl shadow-black/90 bg-neutral-950/40 backdrop-blur-xs py-8 sm:py-14 lg:py-20 px-3.5 sm:px-8 lg:px-12">
+              <div className="relative overflow-hidden rounded-2xl sm:rounded-[2rem] border border-slate-800/90 shadow-2xl bg-[#0d1322] py-8 sm:py-14 lg:py-18 px-4 sm:px-8 lg:px-12">
                 
-                {/* VEHICLE PICTURE BEHIND TRANSPARENT HERO BACKGROUND */}
+                {/* VEHICLE PICTURE BEHIND HERO BACKGROUND */}
                 <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                   <img
                     src={heroVehicleImage}
                     alt="RwandaCarHub Showcase Vehicle"
-                    className="w-full h-full object-cover object-center scale-105 opacity-60 sm:opacity-70 transition-all duration-1000 ease-out"
+                    className="w-full h-full object-cover object-center scale-105 opacity-40 sm:opacity-50 transition-all duration-1000 ease-out"
                     referrerPolicy="no-referrer"
                   />
-                  {/* Multi-layered transparent dark gradients to ensure pristine text readability */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/95 via-neutral-950/80 to-neutral-950/50" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/60 to-neutral-950/20" />
-                  <div className="absolute inset-0 bg-red-950/15 mix-blend-color-dodge" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1d] via-[#0a0f1d]/90 to-[#0a0f1d]/60" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1d] via-[#0a0f1d]/60 to-transparent" />
                 </div>
 
-                {/* Background ambient lighting accents */}
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-800/20 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-0 right-10 w-96 h-96 bg-red-600/15 rounded-full blur-3xl pointer-events-none" />
+                {/* Subtle blue ambient glow */}
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
-                <div className="relative z-10 space-y-8">
-                  <div className="max-w-3xl space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-950/85 border border-red-800/70 text-xs font-bold text-red-300 shadow-md backdrop-blur-md">
-                      <ShieldCheck className="w-4 h-4 text-red-400" />
-                      <span>Certified Automotive Marketplace • Kigali, Rwanda</span>
+                <div className="relative z-10 space-y-6 sm:space-y-8">
+                  <div className="max-w-3xl space-y-3 sm:space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/80 border border-blue-800/60 text-xs font-semibold text-blue-300">
+                      <ShieldCheck className="w-4 h-4 text-blue-400" />
+                      <span>Certified Automotive Marketplace · Kigali, Rwanda</span>
                     </div>
 
-                    <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white font-['Outfit',sans-serif] tracking-tight leading-[1.1] drop-shadow-md">
-                      Buy, Sell, Rent & Lease Cars in <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-red-600 to-amber-500">Rwanda</span>
+                    <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white font-['Outfit',sans-serif] tracking-tight leading-[1.1]">
+                      Buy, Sell, Rent & Lease Cars in <span className="text-blue-500">Rwanda</span>
                     </h1>
 
-                    <p className="pt-8 sm:pt-14 lg:pt-20 text-sm sm:text-base lg:text-lg text-neutral-200 leading-relaxed max-w-2xl drop-shadow-sm font-normal">
-                      Discover verified vehicles from certified Kigali dealerships and trusted private sellers.
+                    <p className="text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl font-normal">
+                      Discover verified vehicles from certified Kigali dealerships and trusted private sellers. Complete with inspection reports and transparent pricing.
                     </p>
 
                     <div className="flex flex-wrap items-center gap-3 pt-2">
                       <button
                         onClick={() => setIsPostCarOpen(true)}
-                        className="px-5 py-3 rounded-xl bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-lg shadow-red-950/80 transition-all hover:scale-[1.02]"
+                        className="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-lg shadow-blue-950 transition-all active:scale-95"
                       >
                         <PlusCircle className="w-4 h-4" />
                         <span>Post Your Car (From 5,000 Frw)</span>
@@ -625,100 +621,100 @@ export default function App() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div 
                   onClick={() => handleTabSelect('buy')}
-                  className="p-4 sm:p-5 rounded-2xl bg-white/85 backdrop-blur-md border border-sky-200 hover:border-sky-400 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md hover:shadow-lg"
+                  className="p-4 sm:p-5 rounded-2xl bg-[#0f172a] border border-slate-800 hover:border-blue-500/60 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-lg"
                 >
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center border border-sky-200 group-hover:bg-sky-600 group-hover:text-white transition-colors">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600/15 text-blue-400 flex items-center justify-center border border-blue-500/30 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     <Car className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-['Outfit',sans-serif]">Buy Certified Cars</h3>
-                  <p className="text-[11px] sm:text-xs text-sky-800/80 line-clamp-1 font-medium">Verified Japanese & European stock</p>
+                  <h3 className="text-xs sm:text-sm font-bold text-white font-['Outfit',sans-serif]">Buy Certified Cars</h3>
+                  <p className="text-[11px] sm:text-xs text-slate-400 line-clamp-1">Verified Japanese & European stock</p>
                 </div>
 
                 <div 
                   onClick={() => handleTabSelect('sell')}
-                  className="p-4 sm:p-5 rounded-2xl bg-white/85 backdrop-blur-md border border-sky-200 hover:border-emerald-400 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md hover:shadow-lg"
+                  className="p-4 sm:p-5 rounded-2xl bg-[#0f172a] border border-slate-800 hover:border-blue-500/60 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-lg"
                 >
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center border border-emerald-200 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600/15 text-blue-400 flex items-center justify-center border border-blue-500/30 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-['Outfit',sans-serif]">Sell Your Car</h3>
-                  <p className="text-[11px] sm:text-xs text-sky-800/80 line-clamp-1 font-medium">Direct buyer contacts in Kigali</p>
+                  <h3 className="text-xs sm:text-sm font-bold text-white font-['Outfit',sans-serif]">Sell Your Car</h3>
+                  <p className="text-[11px] sm:text-xs text-slate-400 line-clamp-1">Direct buyer contacts in Kigali</p>
                 </div>
 
                 <div 
                   onClick={() => handleTabSelect('rent')}
-                  className="p-4 sm:p-5 rounded-2xl bg-white/85 backdrop-blur-md border border-sky-200 hover:border-amber-400 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md hover:shadow-lg"
+                  className="p-4 sm:p-5 rounded-2xl bg-[#0f172a] border border-slate-800 hover:border-blue-500/60 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-lg"
                 >
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center border border-amber-200 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600/15 text-blue-400 flex items-center justify-center border border-blue-500/30 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-['Outfit',sans-serif]">Rent 4x4 Vehicles</h3>
-                  <p className="text-[11px] sm:text-xs text-sky-800/80 line-clamp-1 font-medium">Prado & Land Cruisers for travel</p>
+                  <h3 className="text-xs sm:text-sm font-bold text-white font-['Outfit',sans-serif]">Rent 4x4 Vehicles</h3>
+                  <p className="text-[11px] sm:text-xs text-slate-400 line-clamp-1">Prado & Land Cruisers for travel</p>
                 </div>
 
                 <div 
                   onClick={() => handleTabSelect('services')}
-                  className="p-4 sm:p-5 rounded-2xl bg-white/85 backdrop-blur-md border border-sky-200 hover:border-indigo-400 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-md hover:shadow-lg"
+                  className="p-4 sm:p-5 rounded-2xl bg-[#0f172a] border border-slate-800 hover:border-blue-500/60 cursor-pointer transition-all hover:-translate-y-0.5 space-y-2 group shadow-lg"
                 >
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center border border-indigo-200 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600/15 text-blue-400 flex items-center justify-center border border-blue-500/30 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-['Outfit',sans-serif]">Car Valuation & Check</h3>
-                  <p className="text-[11px] sm:text-xs text-sky-800/80 line-clamp-1 font-medium">Instant valuation & 150-point inspection</p>
+                  <h3 className="text-xs sm:text-sm font-bold text-white font-['Outfit',sans-serif]">Car Valuation & Check</h3>
+                  <p className="text-[11px] sm:text-xs text-slate-400 line-clamp-1">Instant valuation & 150-point inspection</p>
                 </div>
               </div>
             </div>
 
             {/* UNIFIED CLEAR VEHICLES MARKETPLACE SECTION */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-400/40 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-950 font-['Outfit',sans-serif]">
+                  <h2 className="text-xl sm:text-2xl font-black text-white font-['Outfit',sans-serif]">
                     Available Vehicles in Rwanda
                   </h2>
-                  <p className="text-xs text-sky-950/80 font-medium">
+                  <p className="text-xs text-slate-400">
                     Showing {filteredVehicles.length} verified vehicle{filteredVehicles.length > 1 ? 's' : ''} ready in Kigali
                   </p>
                 </div>
 
-                {/* Filter shortcut pills */}
+                {/* Filter tabs */}
                 <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
                   <button
                     onClick={() => setFilters((prev) => ({ ...prev, purpose: 'all' }))}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                       filters.purpose === 'all'
-                        ? 'bg-sky-600 text-white shadow-sm'
-                        : 'bg-white/85 text-sky-900 hover:bg-white border border-sky-200'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
                     }`}
                   >
                     All ({vehicles.length})
                   </button>
                   <button
                     onClick={() => setFilters((prev) => ({ ...prev, purpose: 'buy' }))}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                       filters.purpose === 'buy'
-                        ? 'bg-sky-600 text-white shadow-sm'
-                        : 'bg-white/85 text-sky-900 hover:bg-white border border-sky-200'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
                     }`}
                   >
                     Buy
                   </button>
                   <button
                     onClick={() => setFilters((prev) => ({ ...prev, purpose: 'rent' }))}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                       filters.purpose === 'rent'
-                        ? 'bg-amber-600 text-white shadow-sm'
-                        : 'bg-white/85 text-sky-900 hover:bg-white border border-sky-200'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
                     }`}
                   >
                     Rent
                   </button>
                   <button
                     onClick={() => setFilters((prev) => ({ ...prev, purpose: 'lease' }))}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                       filters.purpose === 'lease'
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'bg-white/85 text-sky-900 hover:bg-white border border-sky-200'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
                     }`}
                   >
                     Lease
@@ -727,15 +723,15 @@ export default function App() {
               </div>
 
               {filteredVehicles.length === 0 ? (
-                <div className="p-12 text-center bg-white/85 backdrop-blur-md rounded-2xl border border-sky-200 space-y-3 shadow-md">
-                  <Car className="w-12 h-12 text-sky-600 mx-auto" />
-                  <h4 className="text-base font-bold text-slate-900">No vehicles match your selected filters.</h4>
-                  <p className="text-xs text-sky-800 font-medium">
+                <div className="p-12 text-center bg-[#0f172a] rounded-2xl border border-slate-800 space-y-3 shadow-md">
+                  <Car className="w-12 h-12 text-blue-500 mx-auto" />
+                  <h4 className="text-base font-bold text-white">No vehicles match your selected filters.</h4>
+                  <p className="text-xs text-slate-400">
                     Try clearing or widening your search criteria to find more cars.
                   </p>
                   <button
                     onClick={() => setFilters(initialFilters)}
-                    className="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold shadow-md"
+                    className="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold shadow-md hover:bg-blue-500 transition-colors"
                   >
                     Reset All Filters
                   </button>
@@ -760,21 +756,21 @@ export default function App() {
               )}
             </div>
 
-            {/* SIMPLE & CLEAR SELLER CALLOUT */}
+            {/* SELLER CALLOUT */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
-              <div className="bg-gradient-to-r from-neutral-900 via-neutral-900 to-red-950/50 rounded-2xl p-6 sm:p-8 border border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
+              <div className="bg-[#0f172a] rounded-2xl p-6 sm:p-8 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
                 <div className="space-y-1.5 text-center sm:text-left">
                   <h3 className="text-lg sm:text-xl font-bold text-white font-['Outfit',sans-serif]">
                     Want to Sell or Rent Your Car in Kigali?
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 max-w-xl">
+                  <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
                     Post your vehicle in minutes and connect directly with verified buyers and renters. Affordable listing packages starting from 5,000 Frw.
                   </p>
                 </div>
 
                 <button
                   onClick={() => setIsPostCarOpen(true)}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white font-bold text-xs sm:text-sm whitespace-nowrap shadow-lg transition-all shrink-0"
+                  className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm whitespace-nowrap shadow-lg shadow-blue-950 transition-all shrink-0"
                 >
                   Post Your Vehicle
                 </button>
@@ -793,15 +789,15 @@ export default function App() {
         {(currentTab === 'buy' || currentTab === 'rent' || currentTab === 'lease') && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/85 backdrop-blur-md border border-sky-200 text-xs font-bold text-sky-800 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/80 border border-blue-800/60 text-xs font-semibold text-blue-300">
                 {currentTab === 'buy' ? '🚗 For Sale in Rwanda' : currentTab === 'rent' ? '🔑 Rental & Safari Fleet' : '📄 Corporate & Long-term Lease'}
               </div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-950 font-['Outfit',sans-serif]">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-['Outfit',sans-serif]">
                 {currentTab === 'buy' && 'Buy Certified Vehicles in Kigali'}
                 {currentTab === 'rent' && 'Car Hire & Safari 4x4 Rental in Rwanda'}
                 {currentTab === 'lease' && 'Long-term Corporate Vehicle Leasing'}
               </h1>
-              <p className="text-xs sm:text-sm text-sky-950/80 max-w-3xl font-medium">
+              <p className="text-xs sm:text-sm text-slate-400 max-w-3xl font-medium">
                 {currentTab === 'buy' && 'Explore verified foreign imports and clean local Rwandan cars with full RRA paperwork and mechanical inspection reports.'}
                 {currentTab === 'rent' && 'Explore Rwanda with confidence. Toyota Prado, Land Cruiser 70-series, RAV4, and luxury sedans with optional driver.'}
                 {currentTab === 'lease' && 'Tailored automotive leasing solutions for NGOs, embassies, corporate executives, and business fleets in Kigali.'}
@@ -819,18 +815,18 @@ export default function App() {
 
             {/* Filtered Vehicles Grid */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs text-sky-950/80 font-medium">
+              <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
                 <span>Showing <strong>{filteredVehicles.length}</strong> available listings</span>
                 <span>Watermark Protection: <strong>www.rwandacarhub.com</strong></span>
               </div>
 
               {filteredVehicles.length === 0 ? (
-                <div className="p-12 text-center bg-white/85 backdrop-blur-md rounded-2xl border border-sky-200 space-y-3 shadow-md">
-                  <Car className="w-12 h-12 text-sky-600 mx-auto" />
-                  <h4 className="text-base font-bold text-slate-900">No cars found matching this criteria.</h4>
+                <div className="p-12 text-center bg-[#0f172a] rounded-2xl border border-slate-800 space-y-3 shadow-md">
+                  <Car className="w-12 h-12 text-blue-500 mx-auto" />
+                  <h4 className="text-base font-bold text-white">No cars found matching this criteria.</h4>
                   <button
                     onClick={() => setFilters(initialFilters)}
-                    className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md"
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md transition-colors"
                   >
                     Reset Filters
                   </button>
@@ -860,47 +856,47 @@ export default function App() {
         {/* ======================= SELL VIEW ======================= */}
         {currentTab === 'sell' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12">
-            <div className="bg-neutral-900 rounded-3xl p-8 sm:p-14 border border-neutral-800 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div className="bg-[#0f172a] rounded-3xl p-8 sm:p-14 border border-slate-800 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
               <div className="max-w-2xl space-y-4">
-                <span className="text-xs font-bold text-red-400 uppercase tracking-wider">
+                <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">
                   RwandaCarHub Seller Center
                 </span>
                 <h1 className="text-3xl sm:text-5xl font-extrabold text-white font-['Outfit',sans-serif]">
                   Sell Your Car in Rwanda Faster than Ever
                 </h1>
-                <p className="text-sm text-neutral-300 leading-relaxed">
+                <p className="text-sm text-slate-300 leading-relaxed">
                   Join hundreds of individual car owners and verified Kigali dealerships. List your car with our official watermark protection, direct WhatsApp buyer connections, and Mobile Money (MoMo) payments.
                 </p>
                 <button
                   onClick={() => setIsPostCarOpen(true)}
-                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xl"
+                  className="px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-blue-950 transition-all active:scale-95"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>Start Listing Now</span>
                 </button>
               </div>
 
-              <div className="w-full md:w-80 p-6 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-4">
+              <div className="w-full md:w-80 p-6 rounded-2xl bg-[#090e1a] border border-slate-800 space-y-4">
                 <h4 className="text-sm font-bold text-white">Why Sellers Choose Us</h4>
-                <div className="space-y-3 text-xs text-neutral-300">
+                <div className="space-y-3 text-xs text-slate-300">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
                     <span>Free Plan for Account Holders (2 cars/day)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
                     <span>5,000 Frw/day for 5 cars (Starter)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
                     <span>15,000 Frw/week for 30 cars (Pro)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
                     <span>35,000 Frw/month for 50 cars (Fleet)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
                     <span>Watermark www.rwandacarhub.com</span>
                   </div>
                 </div>
@@ -910,10 +906,10 @@ export default function App() {
             {/* PRICING PACKAGES DETAIL */}
             <div className="space-y-6">
               <div className="text-center max-w-xl mx-auto">
-                <h3 className="text-2xl font-bold text-slate-950 font-['Outfit',sans-serif]">
+                <h3 className="text-2xl font-bold text-white font-['Outfit',sans-serif]">
                   Choose Your Listing Plan
                 </h3>
-                <p className="text-xs text-sky-950/80 mt-1 font-medium">
+                <p className="text-xs text-slate-400 mt-1 font-medium">
                   Simple, honest pricing with instant Mobile Money (*182#) payment integration, plus a free tier for account holders.
                 </p>
               </div>
@@ -927,19 +923,19 @@ export default function App() {
                       key={plan.id}
                       className={`relative p-6 rounded-3xl border flex flex-col justify-between space-y-6 ${
                         plan.popular
-                          ? 'bg-neutral-900 border-red-600 shadow-2xl'
+                          ? 'bg-[#0f172a] border-blue-500 shadow-2xl shadow-blue-950/50'
                           : isFree
-                          ? 'bg-emerald-950/20 border-emerald-700/80 shadow-lg'
-                          : 'bg-neutral-900/60 border-neutral-800'
+                          ? 'bg-[#0f172a] border-slate-700 shadow-lg'
+                          : 'bg-[#0f172a] border-slate-800'
                       }`}
                     >
                       {plan.popular && (
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-3 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider shadow">
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-3 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider shadow">
                           Most Popular
                         </div>
                       )}
                       {isFree && (
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-3 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider shadow whitespace-nowrap">
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-3 py-0.5 rounded-full bg-slate-800 text-blue-400 border border-slate-700 text-[10px] font-bold uppercase tracking-wider shadow whitespace-nowrap">
                           Account Holders (2 Cars/Day)
                         </div>
                       )}
@@ -947,22 +943,22 @@ export default function App() {
                       <div className="space-y-4">
                         <div className="flex justify-between items-center">
                           <h4 className="text-lg font-bold text-white font-['Outfit',sans-serif]">{plan.name}</h4>
-                          <span className="text-xs px-2.5 py-1 rounded-full bg-neutral-800 text-neutral-300 font-semibold">
+                          <span className="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-semibold">
                             Up to {plan.carLimit} Cars
                           </span>
                         </div>
 
                         <div>
-                          <div className={`text-3xl font-black font-['Outfit',sans-serif] ${isFree ? 'text-emerald-400' : 'text-white'}`}>
+                          <div className={`text-3xl font-black font-['Outfit',sans-serif] ${isFree ? 'text-blue-400' : 'text-white'}`}>
                             {isFree ? '0 Frw' : `${plan.priceFrw.toLocaleString()} Frw`}
                           </div>
-                          <span className={`text-xs font-bold ${isFree ? 'text-emerald-400' : 'text-red-400'}`}>
+                          <span className="text-xs font-bold text-slate-400">
                             {plan.duration}
                           </span>
                         </div>
 
                         {isFree && (
-                          <div className="p-2 rounded-xl bg-emerald-950/60 border border-emerald-800/80 text-[11px] text-emerald-300">
+                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-300">
                             {currentUser ? (
                               <span>✓ Available for your account ({currentUser.name})</span>
                             ) : (
@@ -971,10 +967,10 @@ export default function App() {
                           </div>
                         )}
 
-                        <ul className="space-y-2 text-xs text-neutral-300 border-t border-neutral-800 pt-4">
+                        <ul className="space-y-2 text-xs text-slate-300 border-t border-slate-800 pt-4">
                           {plan.features.map((feat, i) => (
                             <li key={i} className="flex items-center gap-2">
-                              <Check className={`w-3.5 h-3.5 shrink-0 ${isFree ? 'text-emerald-400' : 'text-red-500'}`} />
+                              <Check className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                               <span>{feat}</span>
                             </li>
                           ))}
@@ -987,9 +983,9 @@ export default function App() {
                           setIsPostCarOpen(true);
                         }}
                         className={`w-full py-3 rounded-xl text-white text-xs font-bold shadow-lg transition-all ${
-                          isFree
-                            ? 'bg-emerald-600 hover:bg-emerald-500'
-                            : 'bg-red-700 hover:bg-red-600'
+                          plan.popular || isFree
+                            ? 'bg-blue-600 hover:bg-blue-500'
+                            : 'bg-slate-800 hover:bg-slate-700 text-slate-100'
                         }`}
                       >
                         {isFree ? 'List Free (2 Cars/Day)' : `Post with ${plan.name}`}

@@ -74,120 +74,120 @@ export const ContactView: React.FC<ContactViewProps> = ({ onSendMessage }) => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-10">
       {/* HEADER */}
       <div className="text-center max-w-2xl mx-auto space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/85 backdrop-blur-md border border-sky-200 text-xs font-semibold text-sky-800 shadow-sm">
-          <MapPin className="w-3.5 h-3.5 text-sky-600" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/80 border border-blue-800/60 text-xs font-semibold text-blue-300 shadow-sm">
+          <MapPin className="w-3.5 h-3.5 text-blue-400" />
           <span>Kigali Head Office</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 font-['Outfit',sans-serif]">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-['Outfit',sans-serif]">
           Contact RwandaCarHub
         </h2>
-        <p className="text-sm text-sky-950/80 font-medium">
+        <p className="text-sm text-slate-300 font-medium">
           We are here to assist with vehicle purchases, showroom partnerships, listings, rentals, and test drive inspections.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* CONTACT INFO CARD (5 COLS) */}
-        <div className="lg:col-span-5 bg-neutral-900 rounded-3xl p-6 sm:p-8 border border-neutral-800 space-y-6 shadow-2xl flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-[#0f172a] rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-6 shadow-2xl flex flex-col justify-between">
           <div className="space-y-6">
             <div>
               <h3 className="text-xl font-bold text-white font-['Outfit',sans-serif]">
                 Get In Touch
               </h3>
-              <p className="text-xs text-neutral-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Visit our Kigali headquarters or contact our automotive consultants.
               </p>
             </div>
 
             {/* Exact required contact items */}
             <div className="space-y-4 text-xs sm:text-sm">
-              <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-neutral-950 border border-neutral-800">
-                <MapPin className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-[#0a0f1d] border border-slate-800">
+                <MapPin className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-xs text-neutral-400 block">Physical Address</span>
+                  <span className="text-xs text-slate-400 block">Physical Address</span>
                   <span className="text-white font-bold">Rwanda, Kigali City, KK 713 St</span>
-                  <p className="text-[11px] text-neutral-500 mt-0.5">Kicukiro District, near Sonatubes</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Kicukiro District, near Sonatubes</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-neutral-950 border border-neutral-800">
-                <Phone className="w-5 h-5 text-red-500 shrink-0" />
+              <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-[#0a0f1d] border border-slate-800">
+                <Phone className="w-5 h-5 text-blue-400 shrink-0" />
                 <div>
-                  <span className="text-xs text-neutral-400 block">Direct Telephone</span>
-                  <a href="tel:+250788225193" className="text-white font-bold hover:text-red-400 transition-colors">
+                  <span className="text-xs text-slate-400 block">Direct Telephone</span>
+                  <a href="tel:+250788225193" className="text-white font-bold hover:text-blue-400 transition-colors">
                     +250 788 225 193
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-neutral-950 border border-neutral-800">
-                <MessageSquare className="w-5 h-5 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-[#0a0f1d] border border-slate-800">
+                <MessageSquare className="w-5 h-5 text-blue-400 shrink-0" />
                 <div>
-                  <span className="text-xs text-neutral-400 block">Official WhatsApp Support</span>
+                  <span className="text-xs text-slate-400 block">Official WhatsApp Support</span>
                   <a 
                     href="https://wa.me/250738225193" 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="text-emerald-400 font-bold hover:underline"
+                    className="text-blue-400 font-bold hover:underline"
                   >
                     +250 738 225 193
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-neutral-950 border border-neutral-800">
-                <Mail className="w-5 h-5 text-red-500 shrink-0" />
+              <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-[#0a0f1d] border border-slate-800">
+                <Mail className="w-5 h-5 text-blue-400 shrink-0" />
                 <div>
-                  <span className="text-xs text-neutral-400 block">Official Email</span>
-                  <a href="mailto:trust@rwandacarhub.com" className="text-white font-bold hover:text-red-400 transition-colors">
+                  <span className="text-xs text-slate-400 block">Official Email</span>
+                  <a href="mailto:trust@rwandacarhub.com" className="text-white font-bold hover:text-blue-400 transition-colors">
                     trust@rwandacarhub.com
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-neutral-950 border border-neutral-800">
-                <Globe className="w-5 h-5 text-red-500 shrink-0" />
+              <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-[#0a0f1d] border border-slate-800">
+                <Globe className="w-5 h-5 text-blue-400 shrink-0" />
                 <div>
-                  <span className="text-xs text-neutral-400 block">Website</span>
-                  <span className="text-neutral-200 font-bold">www.rwandacarhub.com</span>
+                  <span className="text-xs text-slate-400 block">Website</span>
+                  <span className="text-slate-200 font-bold">www.rwandacarhub.com</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-neutral-950 border border-neutral-800">
-                <Clock className="w-5 h-5 text-neutral-400 shrink-0" />
+              <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-[#0a0f1d] border border-slate-800">
+                <Clock className="w-5 h-5 text-slate-400 shrink-0" />
                 <div>
-                  <span className="text-xs text-neutral-400 block">Showroom & Support Hours</span>
+                  <span className="text-xs text-slate-400 block">Showroom & Support Hours</span>
                   <span className="text-white font-semibold">Monday – Saturday: 8:00 AM – 7:00 PM</span>
-                  <p className="text-[11px] text-neutral-500">Sunday: By Appointment</p>
+                  <p className="text-[11px] text-slate-500">Sunday: By Appointment</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-red-950/40 border border-red-900/60 text-xs text-neutral-300 flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-red-400 shrink-0" />
+          <div className="p-4 rounded-xl bg-blue-950/40 border border-blue-800/60 text-xs text-slate-300 flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-blue-400 shrink-0" />
             <span>Dedicated Buyer Protection & Vehicle Transfer Assistance</span>
           </div>
         </div>
 
         {/* INTERACTIVE CONTACT & INQUIRY FORM (7 COLS) */}
-        <div className="lg:col-span-7 bg-neutral-900 rounded-3xl p-6 sm:p-8 border border-neutral-800 shadow-2xl space-y-6">
+        <div className="lg:col-span-7 bg-[#0f172a] rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl space-y-6">
           <div>
             <h3 className="text-xl font-bold text-white font-['Outfit',sans-serif]">
               Send Us a Direct Message
             </h3>
-            <p className="text-xs text-neutral-400 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
               Have questions about a car, listing pricing plans, or vehicle import? Fill out the form below.
             </p>
           </div>
 
           {submitted ? (
-            <div className="p-8 text-center bg-emerald-950/40 border border-emerald-800 rounded-2xl space-y-3 animate-in fade-in">
-              <div className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-lg">
+            <div className="p-8 text-center bg-blue-950/40 border border-blue-800 rounded-2xl space-y-3 animate-in fade-in">
+              <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto shadow-lg">
                 <Check className="w-6 h-6" />
               </div>
               <h4 className="text-lg font-bold text-white">Thank You for Contacting Us!</h4>
-              <p className="text-xs text-neutral-300 max-w-md mx-auto">
+              <p className="text-xs text-slate-300 max-w-md mx-auto">
                 Your inquiry has been received by our Kigali support team. We will respond within 15 minutes during normal working hours.
               </p>
             </div>
@@ -202,7 +202,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ onSendMessage }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="contact-full-name" className="block text-xs font-semibold text-neutral-300 mb-1">
+                  <label htmlFor="contact-full-name" className="block text-xs font-semibold text-slate-300 mb-1">
                     Your Name *
                   </label>
                   <input
@@ -212,12 +212,12 @@ export const ContactView: React.FC<ContactViewProps> = ({ onSendMessage }) => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Eric Bizimana"
-                    className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50"
+                    className="w-full px-4 py-2.5 bg-[#0a0f1d] border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="contact-phone-number" className="block text-xs font-semibold text-neutral-300 mb-1">
+                  <label htmlFor="contact-phone-number" className="block text-xs font-semibold text-slate-300 mb-1">
                     Phone Number (Rwanda or International) *
                   </label>
                   <input
@@ -227,14 +227,14 @@ export const ContactView: React.FC<ContactViewProps> = ({ onSendMessage }) => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+250 788 000 000"
-                    className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50"
+                    className="w-full px-4 py-2.5 bg-[#0a0f1d] border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="contact-email-addr" className="block text-xs font-semibold text-neutral-300 mb-1">
+                  <label htmlFor="contact-email-addr" className="block text-xs font-semibold text-slate-300 mb-1">
                     Email Address
                   </label>
                   <input
@@ -243,19 +243,19 @@ export const ContactView: React.FC<ContactViewProps> = ({ onSendMessage }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
-                    className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50"
+                    className="w-full px-4 py-2.5 bg-[#0a0f1d] border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="contact-subject-select" className="block text-xs font-semibold text-neutral-300 mb-1">
+                  <label htmlFor="contact-subject-select" className="block text-xs font-semibold text-slate-300 mb-1">
                     Subject / Topic
                   </label>
                   <select
                     id="contact-subject-select"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50"
+                    className="w-full px-4 py-2.5 bg-[#0a0f1d] border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50"
                   >
                     <option value="Vehicle Inquiry">Inquiring About a Listed Car</option>
                     <option value="Listing Package">Seller Listing Plans (5k/15k/35k Frw)</option>
@@ -268,7 +268,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ onSendMessage }) => {
               </div>
 
               <div>
-                <label htmlFor="contact-message-body" className="block text-xs font-semibold text-neutral-300 mb-1">
+                <label htmlFor="contact-message-body" className="block text-xs font-semibold text-slate-300 mb-1">
                   Your Message *
                 </label>
                 <textarea
@@ -278,14 +278,14 @@ export const ContactView: React.FC<ContactViewProps> = ({ onSendMessage }) => {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="How can we help you today with buying, selling, or renting cars in Rwanda?"
-                  className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50"
+                  className="w-full px-4 py-2.5 bg-[#0a0f1d] border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50"
                 />
               </div>
 
               <button
                 id="contact-form-submit-btn"
                 type="submit"
-                className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white font-bold text-xs sm:text-sm tracking-wide shadow-lg shadow-red-950/80 flex items-center justify-center gap-2 transition-all active:scale-98"
+                className="w-full py-3 px-6 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm tracking-wide shadow-lg shadow-blue-950/80 flex items-center justify-center gap-2 transition-all active:scale-98"
               >
                 <Send className="w-4 h-4" />
                 <span>Submit Message</span>

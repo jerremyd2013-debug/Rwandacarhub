@@ -30,30 +30,49 @@
 }
 
 /* ==========================================================
-   BLUE SKY AUTOMOTIVE SHOWROOM THEME
-   Palette: "Blue Sky & Cerulean Azure" (#38bdf8 / #0284c7)
-   - Atmospheric daytime blue sky with luminous sunlight and soft cloud glows
-   - Preserves Header and Footer in their signature emerald styling
+   PROFESSIONAL 3-COLOR AUTOMOTIVE PALETTE:
+   1. Base & Surfaces: Executive Obsidian Slate (#0a0f1d / #111827)
+   2. Typography & Structure: Crisp White & Slate (#f8fafc / #94a3b8)
+   3. Action & Accent: Royal Cobalt Blue (#2563eb / #3b82f6)
    ========================================================== */
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 }
 
 html {
-  background-color: #38bdf8;
+  background-color: #0a0f1d;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background-color: #38bdf8;
-  color: #0f172a;
+  background-color: #0a0f1d;
+  color: #f8fafc;
   background-image: 
-    radial-gradient(ellipse 95% 45% at 50% -5%, rgba(255, 255, 255, 0.75) 0%, transparent 65%),
-    radial-gradient(ellipse 65% 30% at 15% 18%, rgba(255, 255, 255, 0.45) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 35% at 85% 25%, rgba(255, 255, 255, 0.40) 0%, transparent 50%),
-    radial-gradient(ellipse 85% 40% at 30% 60%, rgba(255, 255, 255, 0.35) 0%, transparent 60%),
-    radial-gradient(ellipse 90% 45% at 70% 85%, rgba(255, 255, 255, 0.45) 0%, transparent 65%),
-    linear-gradient(180deg, #0284c7 0%, #0ea5e9 25%, #38bdf8 55%, #7dd3fc 82%, #bae6fd 100%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37, 99, 235, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 40%, rgba(37, 99, 235, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 10% 70%, rgba(37, 99, 235, 0.04) 0%, transparent 60%);
   background-attachment: fixed;
   background-repeat: no-repeat;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar for sleek professional dark UI */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0f1d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }

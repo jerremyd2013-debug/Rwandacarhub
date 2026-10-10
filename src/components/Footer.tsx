@@ -45,26 +45,26 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
     }, 100);
   };
   return (
-    <footer className="bg-[#061c15] text-slate-300 border-t border-emerald-900/50 pt-16 pb-12">
+    <footer className="bg-[#070b14] text-slate-300 border-t border-slate-800 pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* TOP CALLOUT: POST CAR CTA */}
-        <div className="bg-gradient-to-r from-red-950/80 via-neutral-900 to-neutral-900 rounded-2xl p-6 sm:p-8 border border-red-900/50 mb-14 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="bg-gradient-to-r from-blue-950/40 via-[#0f172a] to-[#0f172a] rounded-2xl p-6 sm:p-8 border border-slate-800 mb-14 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-900/50 border border-red-700/60 text-xs font-semibold text-red-300">
-              <Sparkles className="w-3.5 h-3.5 text-red-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/80 border border-blue-800/60 text-xs font-semibold text-blue-300">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
               <span>Affordable Dealer & Private Seller Rates</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-white font-['Outfit',sans-serif]">
               Want to sell, rent, or lease your vehicle in Rwanda?
             </h3>
-            <p className="text-sm text-neutral-400 max-w-xl">
+            <p className="text-sm text-slate-400 max-w-xl">
               Reach thousands of qualified buyers in Kigali and beyond. List 5 cars for 5,000 Frw/day, 30 cars for 15,000 Frw/week, or 50 cars for 35,000 Frw/month.
             </p>
           </div>
           <button
             id="footer-cta-post-car"
             onClick={handlePostCarClick}
-            className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold text-sm tracking-wide border border-red-500/60 shadow-xl shadow-red-950/80 whitespace-nowrap flex items-center gap-2 transition-all"
+            className="px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm tracking-wide border border-blue-400/40 shadow-xl shadow-blue-950/60 whitespace-nowrap flex items-center gap-2 transition-all"
           >
             <span>Post Your Car Now</span>
             <ArrowUpRight className="w-4 h-4" />
@@ -72,30 +72,30 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
         </div>
 
         {/* MAIN FOOTER COLUMNS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-neutral-800/80">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-800">
           {/* Col 1: Brand & Bio */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-red-700 flex items-center justify-center border border-red-500/40">
+              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center border border-blue-400/40 shadow-md shadow-blue-900/30">
                 <Car className="w-5 h-5 text-white" />
               </div>
               <span className="text-2xl font-extrabold tracking-tight text-white font-['Outfit',sans-serif]">
-                RWANDA<span className="text-red-500">CAR</span>HUB
+                RWANDA<span className="text-blue-500">CAR</span>HUB
               </span>
             </div>
 
-            <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
+            <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
               RwandaCarHub is Rwanda’s premier verified automotive marketplace in Kigali. We connect car buyers, sellers, renters, and licensed dealerships with transparency, trusted pre-inspections, and transparent pricing.
             </p>
 
-            <div className="flex items-center gap-2 text-xs text-red-400 font-medium">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center gap-2 text-xs text-blue-400 font-medium">
+              <ShieldCheck className="w-4 h-4 text-blue-400" />
               <span>Certified Listings & RRA Tax Verification</span>
             </div>
 
             {/* Social Media clickable icons as requested */}
             <div className="pt-2">
-              <p className="text-xs uppercase font-bold text-neutral-400 tracking-wider mb-3">
+              <p className="text-xs uppercase font-bold text-slate-400 tracking-wider mb-3">
                 Follow Us On Social Media
               </p>
               <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
                   href="https://youtube.com/@rwandacarhub" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-9 h-9 rounded-lg bg-neutral-900 hover:bg-red-900/60 border border-neutral-800 hover:border-red-700 text-neutral-300 hover:text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-lg bg-[#0f172a] hover:bg-blue-600 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white flex items-center justify-center transition-all"
                   aria-label="YouTube"
                   title="YouTube @rwandacarhub"
                 >
@@ -113,7 +113,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
                   href="https://facebook.com/rwandacarhub" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-9 h-9 rounded-lg bg-neutral-900 hover:bg-blue-900/60 border border-neutral-800 hover:border-blue-700 text-neutral-300 hover:text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-lg bg-[#0f172a] hover:bg-blue-600 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white flex items-center justify-center transition-all"
                   aria-label="Facebook"
                   title="Facebook @rwandacarhub"
                 >
@@ -123,7 +123,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
                   href="https://instagram.com/rwandacarhub" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-9 h-9 rounded-lg bg-neutral-900 hover:bg-pink-900/60 border border-neutral-800 hover:border-pink-700 text-neutral-300 hover:text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-lg bg-[#0f172a] hover:bg-blue-600 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white flex items-center justify-center transition-all"
                   aria-label="Instagram"
                   title="Instagram @rwandacarhub"
                 >
@@ -133,7 +133,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
                   href="https://x.com/rwandacarhub" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-9 h-9 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-600 text-neutral-300 hover:text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-lg bg-[#0f172a] hover:bg-blue-600 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white flex items-center justify-center transition-all"
                   aria-label="X (Twitter)"
                   title="X (Twitter) @rwandacarhub"
                 >
@@ -143,7 +143,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
                   href="https://linkedin.com/company/rwandacarhub" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-9 h-9 rounded-lg bg-neutral-900 hover:bg-blue-950/80 border border-neutral-800 hover:border-blue-700 text-neutral-300 hover:text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-lg bg-[#0f172a] hover:bg-blue-600 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white flex items-center justify-center transition-all"
                   aria-label="LinkedIn"
                   title="LinkedIn RwandaCarHub"
                 >
@@ -153,7 +153,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
                   href="https://tiktok.com/@rwandacarhub" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-9 h-9 rounded-lg bg-neutral-900 hover:bg-cyan-950/80 border border-neutral-800 hover:border-cyan-700 text-neutral-300 hover:text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-lg bg-[#0f172a] hover:bg-blue-600 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white flex items-center justify-center transition-all"
                   aria-label="TikTok"
                   title="TikTok @rwandacarhub"
                 >
@@ -168,7 +168,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">
               Marketplace
             </h4>
-            <ul className="space-y-2 text-sm text-neutral-400">
+            <ul className="space-y-2 text-sm text-slate-400">
               <li>
                 <button onClick={() => handleNav('buy', 'buy')} className="hover:text-white transition-colors">
                   Buy Cars (SUVs & Sedans)
@@ -207,7 +207,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">
               Company & Legal
             </h4>
-            <ul className="space-y-2 text-sm text-neutral-400">
+            <ul className="space-y-2 text-sm text-slate-400">
               <li>
                 <button onClick={() => handleNav('about')} className="hover:text-white transition-colors">
                   About RwandaCarHub
@@ -222,7 +222,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
                   className="hover:text-white transition-colors text-left flex items-center gap-1.5"
                 >
                   <span>Clients & Partners Hub</span>
-                  <span className="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-950 text-emerald-400 rounded border border-emerald-900/60">
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 bg-blue-950 text-blue-400 rounded border border-blue-900/60">
                     Active
                   </span>
                 </button>
@@ -234,7 +234,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
                   className="hover:text-white transition-colors text-left flex items-center gap-1.5"
                 >
                   <span>Customer Testimonials</span>
-                  <span className="text-[9px] font-bold px-1.5 py-0.2 bg-red-950 text-red-400 rounded border border-red-900/60">
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 bg-blue-950 text-blue-400 rounded border border-blue-900/60">
                     4.9 ★
                   </span>
                 </button>
@@ -290,51 +290,51 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">
               Kigali City Office
             </h4>
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-slate-400">
               Your Trusted Car Marketplace in Rwanda
             </p>
-            <div className="space-y-2.5 text-xs text-neutral-300">
+            <div className="space-y-2.5 text-xs text-slate-300">
               <div className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                 <span>Rwanda, Kigali City, KK 713 St</span>
               </div>
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-red-500 shrink-0" />
+                <Phone className="w-4 h-4 text-blue-400 shrink-0" />
                 <a href="tel:+250788225193" className="hover:text-white transition-colors">
                   +250 788 225 193
                 </a>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-4 h-4 text-emerald-400 font-bold shrink-0 flex items-center justify-center text-[10px]">WA</span>
-                <a href="https://wa.me/250738225193" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">
+                <span className="w-4 h-4 text-blue-400 font-bold shrink-0 flex items-center justify-center text-[10px]">WA</span>
+                <a href="https://wa.me/250738225193" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">
                   WhatsApp: +250 738 225 193
                 </a>
               </div>
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-red-500 shrink-0" />
+                <Mail className="w-4 h-4 text-blue-400 shrink-0" />
                 <a href="mailto:trust@rwandacarhub.com" className="hover:text-white transition-colors">
                   trust@rwandacarhub.com
                 </a>
               </div>
               <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-red-500 shrink-0" />
-                <span className="text-neutral-200">www.rwandacarhub.com</span>
+                <Globe className="w-4 h-4 text-blue-400 shrink-0" />
+                <span className="text-slate-200">www.rwandacarhub.com</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* BOTTOM COPYRIGHT & EXPANSION BADGE */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-400">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div>
             © 2026 RwandaCarHub — All Rights Reserved.
           </div>
-          <div className="flex items-center gap-4 text-neutral-400 flex-wrap justify-center">
+          <div className="flex items-center gap-4 text-slate-400 flex-wrap justify-center">
             <span>Built for Rwanda with East Africa Expansion</span>
             <span>•</span>
             <span>Kigali, Rwanda</span>
             <span>•</span>
-            <span className="text-red-400 font-medium">www.rwandacarhub.com</span>
+            <span className="text-blue-400 font-medium">www.rwandacarhub.com</span>
           </div>
         </div>
       </div>
@@ -342,29 +342,29 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
       {/* INFO / TERMS / PRIVACY MODAL */}
       {infoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-neutral-900 border border-neutral-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+          <div className="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
             <button
               onClick={() => setInfoModal(null)}
-              className="absolute top-4 right-4 p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
               aria-label="Close dialog"
             >
               <X className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-red-950/80 border border-red-800 flex items-center justify-center text-red-400">
+              <div className="w-10 h-10 rounded-xl bg-blue-950/80 border border-blue-800 flex items-center justify-center text-blue-400">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <h3 className="text-lg font-bold text-white font-['Outfit',sans-serif]">
                 {infoModal.title}
               </h3>
             </div>
-            <p className="text-sm text-neutral-300 leading-relaxed">
+            <p className="text-sm text-slate-300 leading-relaxed">
               {infoModal.content}
             </p>
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setInfoModal(null)}
-                className="px-5 py-2 rounded-xl bg-red-800 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors"
               >
                 Understood
               </button>

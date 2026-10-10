@@ -114,7 +114,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = () => {
   return (
     <section 
       id="testimonials-section" 
-      className="py-6 sm:py-8 border-t border-neutral-800/80 bg-neutral-950/40"
+      className="py-6 sm:py-8 border-t border-slate-800 bg-[#070b14]/60"
       aria-label="Testimonials"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4">
@@ -125,13 +125,13 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = () => {
             <h2 className="text-xl sm:text-2xl font-black text-white font-['Outfit',sans-serif] tracking-tight">
               Testimonials
             </h2>
-            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-900 border border-neutral-800 text-[11px] text-neutral-300">
-              <div className="flex items-center text-amber-400">
-                <Star className="w-3.5 h-3.5 fill-amber-400" />
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0a0f1d] border border-slate-700 text-[11px] text-slate-300">
+              <div className="flex items-center text-blue-400">
+                <Star className="w-3.5 h-3.5 fill-blue-400" />
               </div>
               <span className="font-bold text-white">4.9</span>
-              <span className="text-neutral-500">/5</span>
-              <span className="text-neutral-400 text-[10px] hidden sm:inline">• 1,480+ Verified Reviews</span>
+              <span className="text-slate-500">/5</span>
+              <span className="text-slate-400 text-[10px] hidden sm:inline">• 1,480+ Verified Reviews</span>
             </div>
           </div>
 
@@ -139,9 +139,9 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = () => {
             <button
               id="btn-write-review-compact"
               onClick={() => setIsReviewModalOpen(true)}
-              className="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold border border-neutral-800 hover:border-red-600 flex items-center gap-1.5 transition-all whitespace-nowrap"
+              className="px-3 py-1.5 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 text-white text-[11px] font-bold border border-slate-700 hover:border-blue-500 flex items-center gap-1.5 transition-all whitespace-nowrap"
             >
-              <PlusCircle className="w-3.5 h-3.5 text-red-500" />
+              <PlusCircle className="w-3.5 h-3.5 text-blue-400" />
               <span>Add Review</span>
             </button>
 
@@ -150,14 +150,14 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = () => {
               <button
                 onClick={handlePrev}
                 aria-label="Previous testimonial"
-                className="w-7 h-7 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 flex items-center justify-center text-neutral-300 hover:text-white transition-colors"
+                className="w-7 h-7 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={handleNext}
                 aria-label="Next testimonial"
-                className="w-7 h-7 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 flex items-center justify-center text-neutral-300 hover:text-white transition-colors"
+                className="w-7 h-7 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -170,7 +170,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = () => {
           {visibleTestimonials.map((item, index) => (
             <div
               key={`${item.id}-${index}`}
-              className={`p-4 rounded-xl bg-neutral-900/90 border border-neutral-800/90 hover:border-neutral-700 transition-all flex flex-col justify-between space-y-2.5 shadow-sm ${
+              className={`p-4 rounded-xl bg-[#0f172a] border border-slate-800 hover:border-blue-600/60 transition-all flex flex-col justify-between space-y-2.5 shadow-sm ${
                 index > 0 ? 'hidden md:flex' : 'flex'
               } ${index === 2 ? 'md:hidden lg:flex' : ''}`}
             >

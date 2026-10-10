@@ -26,18 +26,18 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-6xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-6xl bg-[#0f172a] border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* TOP BAR */}
-        <div className="px-6 py-4 bg-neutral-950 border-b border-neutral-800 flex items-center justify-between">
+        <div className="px-6 py-4 bg-[#0a0f1d] border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/40">
+            <div className="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center border border-blue-500/40">
               <Layers className="w-4 h-4" />
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-white font-['Outfit',sans-serif]">
                 Vehicle Comparison Matrix
               </h3>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-slate-400">
                 Comparing {vehicles.length} vehicle{vehicles.length > 1 ? 's' : ''} side-by-side
               </p>
             </div>
@@ -47,7 +47,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
             {vehicles.length > 0 && (
               <button
                 onClick={onClearAll}
-                className="text-xs text-neutral-400 hover:text-red-400 flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-neutral-800"
+                className="text-xs text-slate-400 hover:text-blue-400 flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-slate-800"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Clear All</span>
@@ -55,7 +55,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
             )}
             <button
               onClick={onClose}
-              className="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 transition-colors"
+              className="p-2 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 text-slate-300 transition-colors border border-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
@@ -66,25 +66,25 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
         <div className="overflow-x-auto overflow-y-auto p-4 sm:p-6">
           {vehicles.length === 0 ? (
             <div className="text-center py-16 space-y-3">
-              <Layers className="w-12 h-12 text-neutral-600 mx-auto" />
-              <p className="text-sm font-semibold text-neutral-300">No vehicles selected for comparison.</p>
-              <p className="text-xs text-neutral-500">Click the compare icon (stacked layers) on any vehicle card to add it here.</p>
+              <Layers className="w-12 h-12 text-slate-600 mx-auto" />
+              <p className="text-sm font-semibold text-slate-300">No vehicles selected for comparison.</p>
+              <p className="text-xs text-slate-500">Click the compare icon (stacked layers) on any vehicle card to add it here.</p>
             </div>
           ) : (
             <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
                 <tr>
-                  <th className="p-3 bg-neutral-950 text-xs font-bold text-neutral-400 uppercase w-48 sticky left-0 z-10 border-b border-neutral-800">
+                  <th className="p-3 bg-[#0a0f1d] text-xs font-bold text-slate-400 uppercase w-48 sticky left-0 z-10 border-b border-slate-800">
                     Vehicle
                   </th>
                   {vehicles.map((car) => (
-                    <th key={car.id} className="p-3 bg-neutral-950/80 border-b border-neutral-800 min-w-[240px]">
+                    <th key={car.id} className="p-3 bg-[#0a0f1d]/80 border-b border-slate-800 min-w-[240px]">
                       <div className="space-y-2">
-                        <div className="relative aspect-[16/10] rounded-lg overflow-hidden bg-neutral-950 border border-neutral-800">
+                        <div className="relative aspect-[16/10] rounded-lg overflow-hidden bg-[#0a0f1d] border border-slate-800">
                           <img src={car.images[0]} alt="" className="w-full h-full object-cover" />
                           <button
                             onClick={() => onRemoveVehicle(car.id)}
-                            className="absolute top-1.5 right-1.5 p-1 rounded-full bg-black/70 text-white hover:bg-red-600 transition-colors"
+                            className="absolute top-1.5 right-1.5 p-1 rounded-full bg-black/70 text-white hover:bg-blue-600 transition-colors"
                             title="Remove"
                           >
                             <X className="w-3.5 h-3.5" />
@@ -98,7 +98,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                           <h4 className="text-sm font-bold text-white truncate font-['Outfit',sans-serif]">
                             {car.year} {car.make} {car.model}
                           </h4>
-                          <span className="text-xs font-extrabold text-red-400">
+                          <span className="text-xs font-extrabold text-blue-400">
                             {formatPrice(car.priceRwf, car.priceUsd, currency)}
                           </span>
                         </div>
@@ -108,7 +108,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                             onClose();
                             onSelectVehicle(car);
                           }}
-                          className="w-full py-1.5 px-2.5 rounded bg-neutral-800 hover:bg-red-900/60 text-white text-xs font-semibold flex items-center justify-center gap-1 transition-colors"
+                          className="w-full py-1.5 px-2.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-1 transition-colors shadow"
                         >
                           <span>Full Details</span>
                           <ArrowRight className="w-3 h-3" />
@@ -118,9 +118,9 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-800 text-xs text-neutral-300">
+              <tbody className="divide-y divide-slate-800 text-xs text-slate-300">
                 <tr>
-                  <td className="p-3 bg-neutral-950/90 font-semibold text-neutral-400 sticky left-0 z-10">
+                  <td className="p-3 bg-[#0a0f1d]/90 font-semibold text-slate-400 sticky left-0 z-10">
                     Purpose / Market
                   </td>
                   {vehicles.map((car) => (
@@ -131,23 +131,23 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                 </tr>
 
                 <tr>
-                  <td className="p-3 bg-neutral-950/90 font-semibold text-neutral-400 sticky left-0 z-10">
+                  <td className="p-3 bg-[#0a0f1d]/90 font-semibold text-slate-400 sticky left-0 z-10">
                     Price (USD Approx)
                   </td>
                   {vehicles.map((car) => (
-                    <td key={car.id} className="p-3 text-neutral-200">
+                    <td key={car.id} className="p-3 text-slate-200">
                       ${car.priceUsd.toLocaleString()} USD
                     </td>
                   ))}
                 </tr>
 
                 <tr>
-                  <td className="p-3 bg-neutral-950/90 font-semibold text-neutral-400 sticky left-0 z-10">
+                  <td className="p-3 bg-[#0a0f1d]/90 font-semibold text-slate-400 sticky left-0 z-10">
                     Condition
                   </td>
                   {vehicles.map((car) => (
                     <td key={car.id} className="p-3">
-                      <span className="px-2 py-0.5 rounded bg-neutral-800 text-neutral-200 font-semibold">
+                      <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-200 font-semibold">
                         {car.condition}
                       </span>
                     </td>
@@ -155,7 +155,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                 </tr>
 
                 <tr>
-                  <td className="p-3 bg-neutral-950/90 font-semibold text-neutral-400 sticky left-0 z-10">
+                  <td className="p-3 bg-[#0a0f1d]/90 font-semibold text-slate-400 sticky left-0 z-10">
                     Mileage
                   </td>
                   {vehicles.map((car) => (
@@ -166,7 +166,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                 </tr>
 
                 <tr>
-                  <td className="p-3 bg-neutral-950/90 font-semibold text-neutral-400 sticky left-0 z-10">
+                  <td className="p-3 bg-[#0a0f1d]/90 font-semibold text-slate-400 sticky left-0 z-10">
                     Transmission
                   </td>
                   {vehicles.map((car) => (
@@ -177,7 +177,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                 </tr>
 
                 <tr>
-                  <td className="p-3 bg-neutral-950/90 font-semibold text-neutral-400 sticky left-0 z-10">
+                  <td className="p-3 bg-[#0a0f1d]/90 font-semibold text-slate-400 sticky left-0 z-10">
                     Fuel Type
                   </td>
                   {vehicles.map((car) => (
@@ -188,7 +188,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                 </tr>
 
                 <tr>
-                  <td className="p-3 bg-neutral-950/90 font-semibold text-neutral-400 sticky left-0 z-10">
+                  <td className="p-3 bg-[#0a0f1d]/90 font-semibold text-slate-400 sticky left-0 z-10">
                     Engine / Specs
                   </td>
                   {vehicles.map((car) => (
@@ -199,7 +199,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                 </tr>
 
                 <tr>
-                  <td className="p-3 bg-neutral-950/90 font-semibold text-neutral-400 sticky left-0 z-10">
+                  <td className="p-3 bg-[#0a0f1d]/90 font-semibold text-slate-400 sticky left-0 z-10">
                     Body Style
                   </td>
                   {vehicles.map((car) => (
@@ -210,7 +210,7 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                 </tr>
 
                 <tr>
-                  <td className="p-3 bg-neutral-950/90 font-semibold text-neutral-400 sticky left-0 z-10">
+                  <td className="p-3 bg-[#0a0f1d]/90 font-semibold text-slate-400 sticky left-0 z-10">
                     Kigali Location
                   </td>
                   {vehicles.map((car) => (
@@ -221,12 +221,12 @@ export const ComparisonDrawer: React.FC<ComparisonDrawerProps> = ({
                 </tr>
 
                 <tr>
-                  <td className="p-3 bg-neutral-950/90 font-semibold text-neutral-400 sticky left-0 z-10">
+                  <td className="p-3 bg-[#0a0f1d]/90 font-semibold text-slate-400 sticky left-0 z-10">
                     Verified Seller
                   </td>
                   {vehicles.map((car) => (
                     <td key={car.id} className="p-3">
-                      <span className="text-emerald-400 font-semibold">✓ {car.seller.dealerName || car.seller.name}</span>
+                      <span className="text-blue-400 font-semibold">✓ {car.seller.dealerName || car.seller.name}</span>
                     </td>
                   ))}
                 </tr>

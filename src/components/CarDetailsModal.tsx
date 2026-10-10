@@ -156,23 +156,23 @@ export const CarDetailsModal: React.FC<CarDetailsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-5xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
+      <div className="relative w-full max-w-5xl bg-[#0f172a] border border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
         {/* HEADER BAR */}
-        <div className="px-6 py-4 bg-neutral-950 border-b border-neutral-800 flex items-center justify-between gap-4">
+        <div className="px-6 py-4 bg-[#0a0f1d] border-b border-slate-800 flex items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-red-800 text-white">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-600 text-white">
               {vehicle.purpose === 'buy' ? 'For Sale' : vehicle.purpose === 'rent' ? 'For Rent' : 'For Lease'}
             </span>
 
             {/* Availability Status Badge */}
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm ${
               status === 'sold'
-                ? 'bg-red-600 text-white ring-1 ring-red-400'
+                ? 'bg-slate-800 text-slate-300 ring-1 ring-slate-700'
                 : status === 'rented'
-                ? 'bg-amber-500 text-neutral-950 ring-1 ring-amber-300 font-extrabold'
+                ? 'bg-blue-950 text-blue-300 ring-1 ring-blue-700 font-extrabold'
                 : status === 'leased'
-                ? 'bg-purple-600 text-white ring-1 ring-purple-400'
-                : 'bg-emerald-600 text-white ring-1 ring-emerald-400/50'
+                ? 'bg-blue-950 text-blue-300 ring-1 ring-blue-700'
+                : 'bg-blue-600 text-white ring-1 ring-blue-400/50'
             }`}>
               {status === 'sold' ? (
                 <>
@@ -197,7 +197,7 @@ export const CarDetailsModal: React.FC<CarDetailsModalProps> = ({
               )}
             </span>
 
-            <span className="text-xs text-neutral-400 font-medium hidden sm:inline">
+            <span className="text-xs text-slate-400 font-medium hidden sm:inline">
               Ref ID: {vehicle.id}
             </span>
           </div>
@@ -207,8 +207,8 @@ export const CarDetailsModal: React.FC<CarDetailsModalProps> = ({
               onClick={() => onToggleCompare(vehicle.id)}
               className={`p-2 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
                 isCompared
-                  ? 'bg-amber-500 text-neutral-950 border-amber-400'
-                  : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border-neutral-700'
+                  ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-900/40'
+                  : 'bg-[#0a0f1d] hover:bg-slate-800 text-slate-200 border-slate-700'
               }`}
             >
               <Layers className="w-4 h-4" />
@@ -219,17 +219,17 @@ export const CarDetailsModal: React.FC<CarDetailsModalProps> = ({
               onClick={() => onToggleFavorite(vehicle.id)}
               className={`p-2 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
                 isFavorite
-                  ? 'bg-red-700 text-white border-red-600'
-                  : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border-neutral-700'
+                  ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-900/40'
+                  : 'bg-[#0a0f1d] hover:bg-slate-800 text-slate-200 border-slate-700'
               }`}
             >
-              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current text-white' : 'text-red-400'}`} />
+              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current text-white' : 'text-blue-400'}`} />
               <span className="hidden sm:inline">{isFavorite ? 'Saved' : 'Save'}</span>
             </button>
 
             <button
               onClick={onClose}
-              className="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white border border-neutral-700 transition-colors"
+              className="p-2 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition-colors"
               aria-label="Close vehicle modal"
             >
               <X className="w-5 h-5" />
@@ -664,11 +664,11 @@ export const CarDetailsModal: React.FC<CarDetailsModalProps> = ({
                   </div>
 
                   {/* DIRECT CONTACT BUTTONS */}
-                  <div className="space-y-2 pt-2 border-t border-neutral-800">
+                  <div className="space-y-2 pt-2 border-t border-slate-800">
                     <a
                       id="details-call-seller"
                       href={`tel:${vehicle.seller.phone}`}
-                      className="w-full py-2.5 px-4 rounded-xl bg-red-800 hover:bg-red-700 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow"
+                      className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-md shadow-blue-900/30"
                     >
                       <Phone className="w-4 h-4" />
                       <span>Call: {vehicle.seller.phone}</span>
@@ -683,7 +683,7 @@ export const CarDetailsModal: React.FC<CarDetailsModalProps> = ({
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow"
+                      className="w-full py-2.5 px-4 rounded-xl bg-blue-950/80 hover:bg-blue-900 border border-blue-800 text-blue-300 font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow"
                     >
                       <MessageSquare className="w-4 h-4" />
                       <span>Chat on WhatsApp</span>
@@ -692,9 +692,9 @@ export const CarDetailsModal: React.FC<CarDetailsModalProps> = ({
                     <button
                       id="details-open-message-tab"
                       onClick={() => setActiveTab('message')}
-                      className="w-full py-2.5 px-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-200 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+                      className="w-full py-2.5 px-4 rounded-xl bg-[#0a0f1d] hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
                     >
-                      <Send className="w-4 h-4 text-red-500" />
+                      <Send className="w-4 h-4 text-blue-400" />
                       <span>Send In-App Message</span>
                     </button>
                   </div>
