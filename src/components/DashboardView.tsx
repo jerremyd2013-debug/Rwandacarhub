@@ -95,6 +95,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [activeTab, setActiveTab] = useState<'listings' | 'inventory' | 'adverts' | 'favorites' | 'messages' | 'searches' | 'bookings' | 'profile' | 'notifications' | 'approvals'>(
     isAdmin ? 'inventory' : 'listings'
   );
+
+  React.useEffect(() => {
+    if (isAdmin && (activeTab === 'listings' || !['approvals', 'inventory', 'adverts'].includes(activeTab))) {
+      setActiveTab('inventory');
+    }
+  }, [isAdmin]);
   
   const [inventorySearch, setInventorySearch] = useState('');
   const [inventoryStatusFilter, setInventoryStatusFilter] = useState<'all' | 'available' | 'sold' | 'rented' | 'leased'>('all');
@@ -116,33 +122,89 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     { id: 'notif-3', title: 'Welcome to RwandaCarHub', desc: 'Your account is verified. You can post, buy, or rent cars anytime.', time: '3 days ago', read: true }
   ]);
 
+  const adminAccount = accounts.find((a) => a.role === 'admin') || accounts[0];
+
   // GATE 1: GUEST / NOT LOGGED IN
   if (!currentUser) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-6">
-        <div className="w-20 h-20 rounded-3xl bg-neutral-900 border border-neutral-800 flex items-center justify-center mx-auto text-red-500 shadow-xl">
-          <Lock className="w-10 h-10" />
+      <div className="max-w-2xl mx-auto px-4 py-14 text-center space-y-6">
+        <div className="w-16 h-16 rounded-2xl bg-blue-600/15 border border-blue-500/40 flex items-center justify-center mx-auto text-blue-400 shadow-xl shadow-blue-950/50">
+          <ShieldCheck className="w-8 h-8 text-blue-400" />
         </div>
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950 text-red-300 border border-red-800 text-xs font-bold">
-            Authorized Access Only
+        
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/80 text-blue-300 border border-blue-800/80 text-xs font-bold">
+            <Lock className="w-3.5 h-3.5" />
+            RwandaCarHub Control Center
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Outfit',sans-serif]">
-            Dashboard Restricted
+          <h2 className="text-2xl sm:text-3xl font-black text-white font-['Outfit',sans-serif]">
+            Sign In to Access Dashboard
           </h2>
-          <p className="text-neutral-400 text-sm max-w-lg mx-auto leading-relaxed">
-            The dashboard is strictly available for the <strong>Website Administrator</strong> and members who have opened accounts that have been <strong>approved by the administrator</strong>.
+          <p className="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed">
+            The dashboard is available for the <strong>Website Administrator</strong> and verified account holders to manage inventory, approve registrations, and control marketplace ads.
           </p>
         </div>
 
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+        {/* PRIMARY 1-CLICK ADMIN ACCESS CARD */}
+        <div className="p-6 rounded-2xl bg-[#0f172a] border border-blue-600/60 shadow-2xl shadow-blue-950/60 text-left space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">Website Administrator</h3>
+                <p className="text-[11px] text-slate-400">admin@rwandacarhub.com</p>
+              </div>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-950 text-blue-300 border border-blue-700">
+              FULL ACCESS
+            </span>
+          </div>
+
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Gain full authority to approve member accounts, update vehicle statuses (Available / Sold / Rented / Leased), and manage partner advertisements.
+          </p>
+
           <button
-            onClick={onOpenAuthModal}
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-red-700 via-red-800 to-red-900 hover:from-red-600 hover:to-red-800 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-red-950/80 transition-all"
+            id="admin-dashboard-direct-login-btn"
+            onClick={() => onSimulateLogin?.(adminAccount)}
+            className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-950 transition-all active:scale-95"
           >
-            <User className="w-4 h-4" />
-            <span>Sign In / Open Account</span>
+            <ShieldCheck className="w-4 h-4 text-white" />
+            <span>1-Click Sign In as Administrator</span>
           </button>
+        </div>
+
+        {/* QUICK ALTERNATIVE PERSONAS */}
+        <div className="space-y-2 pt-2">
+          <span className="text-xs font-semibold text-slate-400">Or sign in with another account:</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {accounts.filter(a => a.role !== 'admin').slice(0, 2).map((acc) => (
+              <button
+                key={acc.id}
+                onClick={() => onSimulateLogin?.(acc)}
+                className="p-3 rounded-xl bg-[#0f172a] hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-left transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="text-xs font-bold text-white">{acc.name}</div>
+                  <div className="text-[10px] text-slate-400">{acc.email}</div>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0a0f1d] text-slate-300 border border-slate-800 capitalize">
+                  {acc.status}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <div className="pt-3">
+            <button
+              onClick={onOpenAuthModal}
+              className="text-xs font-semibold text-blue-400 hover:text-blue-300 hover:underline transition-colors"
+            >
+              Sign in with custom email / password or open a new account &rarr;
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -151,36 +213,37 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   // GATE 2: PENDING APPROVAL (Logged in but waiting for administrator approval)
   if (!isAdmin && !isApproved) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-6">
-        <div className="w-20 h-20 rounded-3xl bg-amber-950/50 border border-amber-800/80 flex items-center justify-center mx-auto text-amber-400 shadow-xl">
-          <Clock className="w-10 h-10 animate-pulse" />
+      <div className="max-w-2xl mx-auto px-4 py-14 text-center space-y-6">
+        <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-700 flex items-center justify-center mx-auto text-blue-400 shadow-xl">
+          <Clock className="w-8 h-8 text-blue-400 animate-pulse" />
         </div>
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-950 text-amber-300 border border-amber-800 text-xs font-bold">
-            Account Status: Pending Admin Approval
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 text-slate-300 border border-slate-700 text-xs font-bold">
+            Account Status: Pending Admin Verification
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Outfit',sans-serif]">
+          <h2 className="text-2xl sm:text-3xl font-black text-white font-['Outfit',sans-serif]">
             Welcome, {currentUser.name}
           </h2>
-          <p className="text-neutral-400 text-sm max-w-lg mx-auto leading-relaxed">
-            Your account ({currentUser.email}) has been submitted and is currently awaiting manual verification by the <strong>website administrator</strong>. Once approved, the Dashboard will automatically appear in your main navigation bar.
+          <p className="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed">
+            Your account ({currentUser.email}) has been submitted and is currently awaiting verification by the website administrator.
           </p>
         </div>
 
-        {/* Demo Helper Box */}
-        <div className="p-5 rounded-2xl bg-neutral-900 border border-neutral-800 max-w-md mx-auto text-left text-xs space-y-3 shadow-lg">
+        {/* 1-Click switch to admin helper */}
+        <div className="p-5 rounded-2xl bg-[#0f172a] border border-slate-800 text-left text-xs space-y-3 shadow-lg">
           <div className="font-bold text-white flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-red-400" />
-            <span>Administrator Simulation:</span>
+            <ShieldCheck className="w-4 h-4 text-blue-400" />
+            <span>Administrator Verification Simulation:</span>
           </div>
-          <p className="text-neutral-400 leading-relaxed">
-            Want to test how the administrator approves accounts? Switch to the <strong>Website Administrator</strong> account with 1 click to view the pending approval queue and approve your registration!
+          <p className="text-slate-400 leading-relaxed">
+            Want to approve this account right now? Switch to the <strong>Website Administrator</strong> account with 1 click to view the pending approval queue and approve your registration!
           </p>
           <button
-            onClick={onOpenAuthModal}
-            className="w-full py-2.5 rounded-xl bg-red-900/80 hover:bg-red-800 border border-red-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all"
+            onClick={() => onSimulateLogin?.(adminAccount)}
+            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-950"
           >
-            <span>Switch to Website Admin Account</span>
+            <ShieldCheck className="w-4 h-4 text-white" />
+            <span>Switch to Website Admin & Approve</span>
           </button>
         </div>
       </div>
@@ -883,6 +946,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         >
                           <Eye className="w-3.5 h-3.5" />
                           View
+                        </button>
+
+                        <button
+                          onClick={() => onDeleteListing(car.id)}
+                          className="px-2.5 py-1 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 text-slate-400 hover:text-red-400 text-[11px] font-bold flex items-center gap-1 border border-slate-800 transition-colors"
+                          title="Delete vehicle from marketplace"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Delete
                         </button>
                       </div>
                     </div>

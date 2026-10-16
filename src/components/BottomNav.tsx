@@ -298,28 +298,26 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 </div>
               </button>
 
-              {/* Dashboard in menu ONLY IF authorized */}
-              {isDashboardAllowed && (
-                <button
-                  onClick={() => {
-                    onSelectTab('dashboard');
-                    setMenuOpen(false);
-                  }}
-                  className={`p-3.5 rounded-xl border text-left flex flex-col gap-2 transition-all ${
-                    currentTab === 'dashboard' ? 'bg-blue-600 border-blue-400 text-white' : 'bg-blue-950/20 border-blue-800/40 text-blue-300'
-                  }`}
-                >
-                  <div className="w-8 h-8 rounded-lg bg-blue-900 text-white flex items-center justify-center border border-blue-700">
-                    <User className="w-4 h-4" />
+              {/* Dashboard in menu */}
+              <button
+                onClick={() => {
+                  onSelectTab('dashboard');
+                  setMenuOpen(false);
+                }}
+                className={`p-3.5 rounded-xl border text-left flex flex-col gap-2 transition-all ${
+                  currentTab === 'dashboard' ? 'bg-blue-600 border-blue-400 text-white' : 'bg-slate-900 border-slate-800 text-slate-200 hover:bg-slate-850'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-lg bg-blue-900 text-white flex items-center justify-center border border-blue-700">
+                  <User className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold">{currentUser?.role === 'admin' ? 'Admin Dashboard' : 'Dashboard'}</div>
+                  <div className="text-[10px] text-slate-400">
+                    {currentUser?.role === 'admin' ? 'Admin Approvals & Inventory' : 'My Listings & Profile'}
                   </div>
-                  <div>
-                    <div className="text-xs font-bold">Dashboard</div>
-                    <div className="text-[10px] text-blue-200">
-                      {currentUser?.role === 'admin' ? 'Admin Approvals' : 'My Listings'}
-                    </div>
-                  </div>
-                </button>
-              )}
+                </div>
+              </button>
             </div>
           </div>
         </div>
@@ -403,25 +401,25 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             <span className="text-[10px] mt-0.5 tracking-tight">Services</span>
           </button>
 
-          {/* 5. Dashboard (ONLY if allowed: Admin or Approved Member) */}
-          {isDashboardAllowed && (
-            <button
-              id="mobile-nav-bottom-dashboard"
-              onClick={() => {
-                setMenuOpen(false);
-                setCarsSheetOpen(false);
-                onSelectTab('dashboard');
-              }}
-              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all min-w-[52px] ${
-                currentTab === 'dashboard'
-                  ? 'text-blue-500 font-bold'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <User className={`w-5 h-5 ${currentTab === 'dashboard' ? 'text-blue-500 stroke-[2.5]' : ''}`} />
-              <span className="text-[10px] mt-0.5 tracking-tight">Dashboard</span>
-            </button>
-          )}
+          {/* 5. Dashboard */}
+          <button
+            id="mobile-nav-bottom-dashboard"
+            onClick={() => {
+              setMenuOpen(false);
+              setCarsSheetOpen(false);
+              onSelectTab('dashboard');
+            }}
+            className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all min-w-[52px] ${
+              currentTab === 'dashboard'
+                ? 'text-blue-500 font-bold'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <User className={`w-5 h-5 ${currentTab === 'dashboard' ? 'text-blue-500 stroke-[2.5]' : ''}`} />
+            <span className="text-[10px] mt-0.5 tracking-tight font-medium">
+              {currentUser?.role === 'admin' ? 'Admin' : 'Dashboard'}
+            </span>
+          </button>
 
           {/* 6. Login Button (ALWAYS VISIBLE) */}
           <button

@@ -89,6 +89,9 @@ export default function App() {
     if (acc) {
       const badge = acc.role === 'admin' ? 'Website Admin' : acc.status === 'approved' ? 'Approved Member' : 'Pending Approval';
       showToast(`Switched account to: ${acc.name} (${badge})`);
+      if (acc.role === 'admin' || acc.status === 'approved') {
+        setCurrentTab('dashboard');
+      }
     } else {
       showToast('Logged out of RwandaCarHub.');
       if (currentTab === 'dashboard') {
@@ -1097,7 +1100,9 @@ export default function App() {
         onClose={() => setIsAuthModalOpen(false)}
         currentUser={currentUser}
         accounts={accounts}
+        onLogin={handleSelectUser}
         onSelectUser={handleSelectUser}
+        onLogout={() => handleSelectUser(null)}
         onRegister={handleRegisterAccount}
       />
 

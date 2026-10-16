@@ -389,35 +389,38 @@ export const Header: React.FC<HeaderProps> = ({
               Contact
             </button>
 
-            {/* 6. DASHBOARD - ONLY VISIBLE FOR ADMIN & APPROVED ACCOUNTS */}
-            {isDashboardAllowed && (
-              <button
-                id="nav-dashboard"
-                onClick={() => handleNavClick('dashboard')}
-                className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                  currentTab === 'dashboard' 
-                    ? 'text-white bg-blue-600 border border-blue-400 shadow-lg shadow-blue-950/80' 
-                    : 'text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700'
-                }`}
-              >
-                <User className="w-4 h-4 text-blue-300" />
-                <span>Dashboard</span>
-                {currentUser?.role === 'admin' ? (
-                  <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-blue-900 text-blue-200 border border-blue-700 tracking-wide">
-                    ADMIN
-                  </span>
-                ) : (
-                  <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-slate-800 text-slate-300 border border-slate-700">
-                    APPROVED
-                  </span>
-                )}
-                {currentUser?.role === 'admin' && pendingApprovalsCount > 0 && (
-                  <span className="w-5 h-5 rounded-full bg-blue-500 text-white font-black text-[10px] flex items-center justify-center">
-                    {pendingApprovalsCount}
-                  </span>
-                )}
-              </button>
-            )}
+            {/* 6. DASHBOARD / ADMIN - ALWAYS ACCESSIBLE */}
+            <button
+              id="nav-dashboard"
+              onClick={() => handleNavClick('dashboard')}
+              className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
+                currentTab === 'dashboard' 
+                  ? 'text-white bg-blue-600 border border-blue-400 shadow-lg shadow-blue-950/80' 
+                  : 'text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700'
+              }`}
+              title={currentUser?.role === 'admin' ? 'Open Website Administrator Dashboard' : 'Open Dashboard'}
+            >
+              <User className="w-4 h-4 text-blue-300" />
+              <span>{currentUser?.role === 'admin' ? 'Admin Dashboard' : 'Dashboard'}</span>
+              {currentUser?.role === 'admin' ? (
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-blue-900 text-blue-200 border border-blue-700 tracking-wide">
+                  ADMIN
+                </span>
+              ) : currentUser?.status === 'approved' ? (
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-slate-800 text-slate-300 border border-slate-700">
+                  APPROVED
+                </span>
+              ) : (
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-slate-800 text-blue-400 border border-slate-700">
+                  ADMIN / USER
+                </span>
+              )}
+              {currentUser?.role === 'admin' && pendingApprovalsCount > 0 && (
+                <span className="w-5 h-5 rounded-full bg-blue-500 text-white font-black text-[10px] flex items-center justify-center">
+                  {pendingApprovalsCount}
+                </span>
+              )}
+            </button>
 
             {/* 7. LOGIN BUTTON (ALWAYS CLEARLY LABELED AND ACCESSIBLE) */}
             <button
@@ -605,21 +608,19 @@ export const Header: React.FC<HeaderProps> = ({
             Contact
           </button>
 
-          {/* 6. Dashboard (ONLY if authorized!) */}
-          {isDashboardAllowed && (
-            <button
-              id="mobile-strip-dashboard"
-              onClick={() => handleNavClick('dashboard')}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors flex items-center gap-1 ${
-                currentTab === 'dashboard'
-                  ? 'bg-blue-600 text-white font-bold border border-blue-400 shadow-sm'
-                  : 'text-blue-400 hover:text-white hover:bg-slate-800 border border-blue-500/30'
-              }`}
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </button>
-          )}
+          {/* 6. Dashboard / Admin */}
+          <button
+            id="mobile-strip-dashboard"
+            onClick={() => handleNavClick('dashboard')}
+            className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors flex items-center gap-1 ${
+              currentTab === 'dashboard'
+                ? 'bg-blue-600 text-white font-bold border border-blue-400 shadow-sm'
+                : 'text-blue-400 hover:text-white hover:bg-slate-800 border border-blue-500/30'
+            }`}
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>{currentUser?.role === 'admin' ? 'Admin' : 'Dashboard'}</span>
+          </button>
 
           {/* 7. Login */}
           <button
