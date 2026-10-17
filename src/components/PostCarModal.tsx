@@ -15,7 +15,7 @@ import {
   Lock
 } from 'lucide-react';
 import { Vehicle, ListingPricingPlan, UserAccount } from '../types';
-import { LISTING_PRICING_PLANS } from '../data/cars';
+import { LISTING_PRICING_PLANS, ADMIN_UNLIMITED_PLAN } from '../data/cars';
 
 interface PostCarModalProps {
   isOpen: boolean;
@@ -36,12 +36,23 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const defaultPlan = (initialPlanId 
-    ? LISTING_PRICING_PLANS.find((p) => p.id === initialPlanId) 
-    : (currentUser ? LISTING_PRICING_PLANS[0] : LISTING_PRICING_PLANS[1])) || LISTING_PRICING_PLANS[0];
+  const isAdmin = currentUser?.role === 'admin' || Boolean(currentUser?.isUnlimitedPosts);
+
+  const defaultPlan = isAdmin
+    ? ADMIN_UNLIMITED_PLAN
+    : (initialPlanId 
+        ? LISTING_PRICING_PLANS.find((p) => p.id === initialPlanId) 
+        : (currentUser ? LISTING_PRICING_PLANS[0] : LISTING_PRICING_PLANS[1])) || LISTING_PRICING_PLANS[0];
 
   const [step, setStep] = useState<'plan' | 'details' | 'payment' | 'success'>('plan');
   const [selectedPlan, setSelectedPlan] = useState<ListingPricingPlan>(defaultPlan);
+
+  // Keep admin plan synced to unlimited VIP
+  React.useEffect(() => {
+    if (isAdmin) {
+      setSelectedPlan(ADMIN_UNLIMITED_PLAN);
+    }
+  }, [isAdmin, isOpen]);
 
   // Form Fields
   const [make, setMake] = useState('Toyota');
@@ -68,7 +79,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
   const calculatedUsd = Math.round(priceRwf / 1380);
 
   const handleProceedToDetails = () => {
-    if (selectedPlan.requiresAccount && !currentUser) {
+    if (!isAdmin && selectedPlan.requiresAccount && !currentUser) {
       setAccountGateNotice(true);
       return;
     }
@@ -178,7 +189,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
           <span className="text-slate-600">→</span>
           <div className={`flex items-center gap-1.5 ${step === 'payment' ? 'text-blue-400 font-bold' : 'text-slate-400'}`}>
             <span className="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px]">3</span>
-            <span>{selectedPlan.priceFrw === 0 ? 'Confirmation (Free)' : 'Payment (MoMo)'}</span>
+            <span>{isAdmin || selectedPlan.priceFrw === 0 ? 'Confirmation (Free)' : 'Payment (MoMo)'}</span>
           </div>
         </div>
 
@@ -196,8 +207,35 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 </p>
               </div>
 
-              {/* ACCOUNT HOLDERS NOTICE BANNER */}
-              {currentUser ? (
+              {/* ACCOUNT HOLDERS OR ADMIN NOTICE BANNER */}
+              {isAdmin ? (
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/80 to-[#0a0f1d] border border-blue-500/80 text-xs text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl shadow-blue-950/40">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-md">
+                      <ShieldCheck className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-extrabold text-sm text-white font-['Outfit',sans-serif]">Website Administrator Account Active</span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-black bg-blue-900 text-blue-200 border border-blue-700">100% FREE & UNLIMITED</span>
+                      </div>
+                      <p className="text-xs text-blue-200/90 mt-0.5">
+                        Logged in as <strong>{currentUser?.name}</strong> • You have permanent authorization for <strong>Free and Unlimited</strong> car posts with zero daily quotas and no Mobile Money payment required.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedPlan(ADMIN_UNLIMITED_PLAN);
+                      setStep('details');
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold whitespace-nowrap shadow-md transition-all active:scale-95 shrink-0"
+                  >
+                    Quick Post (Admin VIP) &rarr;
+                  </button>
+                </div>
+              ) : currentUser ? (
                 <div className="p-3.5 rounded-xl bg-blue-950/40 border border-blue-800/80 text-xs text-blue-200 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <UserCheck className="w-4 h-4 text-blue-400 shrink-0" />
@@ -227,9 +265,10 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
 
               {/* LISTING PLANS GRID */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                {LISTING_PRICING_PLANS.map((plan) => {
+                {(isAdmin ? [ADMIN_UNLIMITED_PLAN, ...LISTING_PRICING_PLANS.filter(p => p.id !== 'plan-free')] : LISTING_PRICING_PLANS).map((plan) => {
                   const isSelected = selectedPlan.id === plan.id;
-                  const isFree = plan.priceFrw === 0;
+                  const isFree = isAdmin || plan.priceFrw === 0;
+                  const isAdminVIP = plan.id === 'plan-admin';
 
                   return (
                     <div
@@ -240,19 +279,22 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                       }}
                       className={`relative p-4 rounded-2xl cursor-pointer border-2 transition-all flex flex-col justify-between ${
                         isSelected 
-                          ? isFree
-                            ? 'bg-blue-950/40 border-blue-500 shadow-xl shadow-blue-950/50'
-                            : 'bg-blue-950/40 border-blue-500 shadow-xl shadow-blue-950/50' 
+                          ? 'bg-blue-950/40 border-blue-500 shadow-xl shadow-blue-950/50' 
                           : 'bg-[#0a0f1d] border-slate-800 hover:border-slate-700'
                       }`}
                     >
                       {/* BADGES */}
-                      {plan.popular && (
+                      {isAdminVIP && (
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider shadow whitespace-nowrap">
+                          Admin VIP (Unlimited)
+                        </div>
+                      )}
+                      {!isAdminVIP && plan.popular && (
                         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider shadow whitespace-nowrap">
                           Most Popular
                         </div>
                       )}
-                      {isFree && (
+                      {!isAdminVIP && plan.priceFrw === 0 && (
                         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider shadow whitespace-nowrap">
                           Account Free Tier
                         </div>
@@ -264,7 +306,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                             {plan.name}
                           </h5>
                           <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold whitespace-nowrap shrink-0">
-                            {plan.carLimit} Cars
+                            {plan.carLimit > 1000 ? 'Unlimited (∞)' : `${plan.carLimit} Cars`}
                           </span>
                         </div>
 
@@ -272,18 +314,25 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                           <div className={`text-2xl font-black font-['Outfit',sans-serif] ${isFree ? 'text-blue-400' : 'text-white'}`}>
                             {isFree ? '0 Frw' : `${plan.priceFrw.toLocaleString()} Frw`}
                           </div>
-                          <p className={`text-xs font-semibold ${isFree ? 'text-blue-400' : 'text-blue-400'}`}>
-                            {plan.duration}
+                          <p className="text-xs font-semibold text-blue-400">
+                            {isAdmin ? 'Free for Admin (Unlimited)' : plan.duration}
                           </p>
                         </div>
 
                         {/* PLAN MEMBER STATUS NOTE */}
-                        {isFree && (
+                        {isAdminVIP ? (
+                          <div className="pt-1">
+                            <div className="p-1.5 rounded-lg bg-blue-950/80 border border-blue-700 text-[10px] text-blue-300 flex items-center gap-1 font-semibold">
+                              <ShieldCheck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                              <span>Unlocked • Unlimited Posts</span>
+                            </div>
+                          </div>
+                        ) : plan.priceFrw === 0 ? (
                           <div className="pt-1">
                             {currentUser ? (
                               <div className="p-1.5 rounded-lg bg-emerald-950/80 border border-emerald-800/80 text-[10px] text-emerald-300 flex items-center gap-1 font-semibold">
                                 <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
-                                <span>Unlocked (2 cars/day quota)</span>
+                                <span>{isAdmin ? 'Unlimited for Admin' : 'Unlocked (2 cars/day quota)'}</span>
                               </div>
                             ) : (
                               <div className="p-1.5 rounded-lg bg-amber-950/70 border border-amber-800/80 text-[10px] text-amber-300 flex items-center justify-between gap-1 font-medium">
@@ -306,12 +355,12 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                               </div>
                             )}
                           </div>
-                        )}
+                        ) : null}
 
-                        <ul className="space-y-1.5 text-xs text-neutral-300 pt-2 border-t border-neutral-800">
+                        <ul className="space-y-1.5 text-xs text-slate-300 pt-2 border-t border-slate-800">
                           {plan.features.map((feat, i) => (
                             <li key={i} className="flex items-start gap-1.5 text-[11px]">
-                              <Check className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${isFree ? 'text-emerald-400' : 'text-red-500'}`} />
+                              <Check className="w-3.5 h-3.5 shrink-0 mt-0.5 text-blue-400" />
                               <span>{feat}</span>
                             </li>
                           ))}
@@ -322,8 +371,8 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                         type="button"
                         className={`mt-4 w-full py-2 px-3 rounded-lg text-xs font-bold transition-all ${
                           isSelected
-                            ? isFree ? 'bg-emerald-600 text-white' : 'bg-red-700 text-white'
-                            : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                         }`}
                       >
                         {isSelected ? 'Selected' : 'Choose Plan'}
@@ -335,13 +384,13 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
 
               {/* ACCOUNT GATE NOTICE WHEN SELECTING FREE PLAN WITHOUT LOGIN */}
               {accountGateNotice && (
-                <div className="p-4 rounded-xl bg-amber-950/80 border border-amber-700 text-amber-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+                <div className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
                   <div className="flex items-start sm:items-center gap-2.5">
-                    <Lock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
+                    <Lock className="w-5 h-5 text-blue-400 shrink-0 mt-0.5 sm:mt-0" />
                     <div>
                       <p className="font-bold text-white text-sm">Account Required for Free Plan</p>
-                      <p className="text-amber-300/90 text-xs mt-0.5">
-                        The Free Listing Plan (2 cars per day) is exclusively available to people who have accounts on RwandaCarHub. Please log in or create a free account to proceed.
+                      <p className="text-slate-300 text-xs mt-0.5">
+                        The Free Listing Plan is exclusively available to members with accounts on RwandaCarHub. Website administrators enjoy 100% free and unlimited posts.
                       </p>
                     </div>
                   </div>
@@ -350,7 +399,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                       <button
                         type="button"
                         onClick={onOpenAuthModal}
-                        className="px-3.5 py-1.5 rounded-lg bg-yellow-400 hover:bg-yellow-300 text-neutral-950 font-bold text-xs shadow"
+                        className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow"
                       >
                         Log In / Register
                       </button>
@@ -361,7 +410,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                         setSelectedPlan(LISTING_PRICING_PLANS[1]);
                         setAccountGateNotice(false);
                       }}
-                      className="px-3 py-1.5 rounded-lg bg-neutral-800 text-neutral-300 text-xs hover:text-white"
+                      className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs hover:text-white"
                     >
                       Use Starter Plan
                     </button>
@@ -373,7 +422,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 <button
                   type="button"
                   onClick={handleProceedToDetails}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white text-xs font-bold flex items-center gap-2 shadow-lg"
+                  className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-950 transition-all active:scale-95"
                 >
                   <span>Continue to Vehicle Details</span>
                   <ArrowRight className="w-4 h-4" />
@@ -659,29 +708,117 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep('plan')}
-                  className="px-4 py-2.5 rounded-xl bg-neutral-800 text-neutral-300 text-xs font-semibold hover:bg-neutral-700"
+                  className="px-4 py-2.5 rounded-xl bg-[#0a0f1d] border border-slate-700 text-slate-300 text-xs font-semibold hover:bg-slate-800 transition-colors"
                 >
-                  Back
+                  Back to Plan
                 </button>
                 <button
                   type="submit"
-                  className={`px-6 py-2.5 rounded-xl text-white text-xs font-bold flex items-center gap-1.5 shadow ${
-                    selectedPlan.priceFrw === 0
-                      ? 'bg-emerald-600 hover:bg-emerald-500'
-                      : 'bg-red-700 hover:bg-red-600'
+                  className={`px-6 py-2.5 rounded-xl text-white text-xs font-bold flex items-center gap-1.5 shadow transition-all ${
+                    isAdmin || selectedPlan.priceFrw === 0
+                      ? 'bg-blue-600 hover:bg-blue-500'
+                      : 'bg-blue-600 hover:bg-blue-500'
                   }`}
                 >
-                  <span>{selectedPlan.priceFrw === 0 ? 'Review & Publish (Free 0 Frw)' : 'Proceed to Payment'}</span>
+                  <span>
+                    {isAdmin
+                      ? 'Review & Publish (Admin VIP 0 Frw)'
+                      : selectedPlan.priceFrw === 0
+                      ? 'Review & Publish (Free 0 Frw)'
+                      : 'Proceed to Payment'}
+                  </span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             </form>
           )}
 
-          {/* STEP 3: ACTIVATION (FREE PLAN FOR ACCOUNT HOLDERS) */}
-          {step === 'payment' && selectedPlan.priceFrw === 0 && (
-            <div className="max-w-md mx-auto p-6 bg-neutral-950 rounded-2xl border border-neutral-800 space-y-5 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto">
+          {/* STEP 3A: ADMIN VIP CONFIRMATION (100% FREE & UNLIMITED POSTS) */}
+          {step === 'payment' && isAdmin && (
+            <div className="max-w-md mx-auto p-6 bg-[#0a0f1d] rounded-2xl border border-blue-500/60 space-y-5 text-center shadow-2xl shadow-blue-950/50">
+              <div className="w-16 h-16 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/50 flex items-center justify-center mx-auto shadow-lg shadow-blue-950/60">
+                <ShieldCheck className="w-8 h-8 text-blue-400" />
+              </div>
+
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-700 text-[11px] font-black uppercase tracking-wider">
+                  <Sparkles className="w-3 h-3 text-blue-400" />
+                  Website Administrator VIP Privilege
+                </div>
+                <h4 className="text-xl font-black text-white font-['Outfit',sans-serif]">
+                  100% Free & Unlimited Posts
+                </h4>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  As the verified <strong>Website Administrator</strong>, your account has permanent lifetime authorization to post as many vehicles as you want for FREE with zero daily limits and no Mobile Money payment required.
+                </p>
+              </div>
+
+              <div className="p-4 bg-[#0f172a] rounded-xl border border-slate-800 text-left space-y-2.5 text-xs">
+                <div className="flex justify-between text-slate-300">
+                  <span>Administrator Account:</span>
+                  <span className="font-bold text-white">{currentUser?.name || sellerName}</span>
+                </div>
+                <div className="flex justify-between text-slate-300">
+                  <span>Authorized Role:</span>
+                  <span className="font-bold text-blue-400">Website Super Administrator</span>
+                </div>
+                <div className="flex justify-between text-slate-300">
+                  <span>Listing Allowance:</span>
+                  <span className="font-extrabold text-blue-300">Unlimited Vehicles (No Quota Limit)</span>
+                </div>
+                <div className="flex justify-between text-slate-300">
+                  <span>Duration:</span>
+                  <span className="font-semibold text-white">Permanent / Unlimited</span>
+                </div>
+                <div className="flex justify-between text-slate-300">
+                  <span>Vehicle Listing:</span>
+                  <span className="font-semibold text-white truncate max-w-[180px]">{year} {make} {model}</span>
+                </div>
+                <div className="flex justify-between text-slate-300">
+                  <span>Official Watermark:</span>
+                  <span className="text-blue-400 font-mono text-[11px]">www.rwandacarhub.com</span>
+                </div>
+                <div className="flex justify-between text-sm font-extrabold text-blue-400 border-t border-slate-800 pt-2.5">
+                  <span>Total Amount Due:</span>
+                  <span className="font-black">0 Frw (100% Free • Admin VIP)</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  disabled={paymentProcessing}
+                  onClick={handleConfirmPaymentAndPublish}
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs tracking-wide shadow-lg shadow-blue-950 flex items-center justify-center gap-2 transition-all active:scale-95"
+                >
+                  {paymentProcessing ? (
+                    <span className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 animate-spin text-white" />
+                      Publishing Admin Listing to Rwanda Marketplace...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-white" />
+                      Publish Vehicle Listing Now (Free & Unlimited Admin Post)
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setStep('details')}
+                  className="w-full py-2 text-xs text-slate-400 hover:text-white transition-colors"
+                >
+                  &larr; Back to edit car details
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3B: ACTIVATION (FREE PLAN FOR STANDARD REGISTERED ACCOUNT HOLDERS) */}
+          {step === 'payment' && !isAdmin && selectedPlan.priceFrw === 0 && (
+            <div className="max-w-md mx-auto p-6 bg-[#0a0f1d] rounded-2xl border border-slate-800 space-y-5 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/40 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
 
@@ -689,29 +826,29 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 <h4 className="text-lg font-bold text-white font-['Outfit',sans-serif]">
                   Free Account Listing (0 Frw)
                 </h4>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-slate-400">
                   Included with your registered RwandaCarHub account: <strong>2 vehicles per day for FREE</strong>.
                 </p>
               </div>
 
-              <div className="p-4 bg-neutral-900 rounded-xl border border-neutral-800 text-left space-y-2.5">
-                <div className="flex justify-between text-xs text-neutral-300">
+              <div className="p-4 bg-[#0f172a] rounded-xl border border-slate-800 text-left space-y-2.5">
+                <div className="flex justify-between text-xs text-slate-300">
                   <span>Account Member:</span>
                   <span className="font-bold text-white">{currentUser?.name || sellerName}</span>
                 </div>
-                <div className="flex justify-between text-xs text-neutral-300">
+                <div className="flex justify-between text-xs text-slate-300">
                   <span>Selected Package:</span>
-                  <span className="font-bold text-emerald-400">Free Member Listing</span>
+                  <span className="font-bold text-blue-400">Free Member Listing</span>
                 </div>
-                <div className="flex justify-between text-xs text-neutral-300">
+                <div className="flex justify-between text-xs text-slate-300">
                   <span>Daily Quota:</span>
                   <span className="font-semibold text-white">Up to 2 vehicles per day</span>
                 </div>
-                <div className="flex justify-between text-xs text-neutral-300">
+                <div className="flex justify-between text-xs text-slate-300">
                   <span>Official Watermark:</span>
-                  <span className="text-emerald-400 font-mono text-[11px]">www.rwandacarhub.com</span>
+                  <span className="text-blue-400 font-mono text-[11px]">www.rwandacarhub.com</span>
                 </div>
-                <div className="flex justify-between text-sm font-extrabold text-emerald-400 border-t border-neutral-800 pt-2.5">
+                <div className="flex justify-between text-sm font-extrabold text-blue-400 border-t border-slate-800 pt-2.5">
                   <span>Total Due:</span>
                   <span>0 Frw (100% Free • No MoMo Required)</span>
                 </div>
@@ -722,7 +859,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                   type="button"
                   disabled={paymentProcessing}
                   onClick={handleConfirmPaymentAndPublish}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold text-xs tracking-wide shadow-lg flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs tracking-wide shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
                   {paymentProcessing ? (
                     <span>Publishing to Marketplace...</span>
@@ -734,7 +871,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep('details')}
-                  className="w-full py-2 text-xs text-neutral-400 hover:text-neutral-200"
+                  className="w-full py-2 text-xs text-slate-400 hover:text-white transition-colors"
                 >
                   Back to edit car specs
                 </button>
@@ -742,10 +879,10 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
             </div>
           )}
 
-          {/* STEP 3: PAYMENT FOR PAID PLANS (MTN MOMO / AIRTEL MONEY RWANDA) */}
-          {step === 'payment' && selectedPlan.priceFrw > 0 && (
-            <div className="max-w-md mx-auto p-6 bg-neutral-950 rounded-2xl border border-neutral-800 space-y-5 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center mx-auto">
+          {/* STEP 3C: PAYMENT FOR PAID PLANS (MTN MOMO / AIRTEL MONEY RWANDA) */}
+          {step === 'payment' && !isAdmin && selectedPlan.priceFrw > 0 && (
+            <div className="max-w-md mx-auto p-6 bg-[#0a0f1d] rounded-2xl border border-slate-800 space-y-5 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/40 flex items-center justify-center mx-auto">
                 <Smartphone className="w-7 h-7" />
               </div>
 
@@ -753,32 +890,32 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 <h4 className="text-lg font-bold text-white font-['Outfit',sans-serif]">
                   Complete Listing Fee Payment
                 </h4>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-slate-400">
                   Pay with Mobile Money (MTN MoMo `*182#` or Airtel Money)
                 </p>
               </div>
 
-              <div className="p-4 bg-neutral-900 rounded-xl border border-neutral-800 text-left space-y-2">
-                <div className="flex justify-between text-xs text-neutral-300">
+              <div className="p-4 bg-[#0f172a] rounded-xl border border-slate-800 text-left space-y-2">
+                <div className="flex justify-between text-xs text-slate-300">
                   <span>Selected Plan:</span>
                   <span className="font-bold text-white">{selectedPlan.name}</span>
                 </div>
-                <div className="flex justify-between text-xs text-neutral-300">
+                <div className="flex justify-between text-xs text-slate-300">
                   <span>Listing Allowance:</span>
                   <span>Up to {selectedPlan.carLimit} vehicles</span>
                 </div>
-                <div className="flex justify-between text-xs text-neutral-300">
+                <div className="flex justify-between text-xs text-slate-300">
                   <span>Duration:</span>
                   <span>{selectedPlan.duration}</span>
                 </div>
-                <div className="flex justify-between text-sm font-extrabold text-red-400 border-t border-neutral-800 pt-2">
+                <div className="flex justify-between text-sm font-extrabold text-blue-400 border-t border-slate-800 pt-2">
                   <span>Total Due:</span>
                   <span>{selectedPlan.priceFrw.toLocaleString()} Frw</span>
                 </div>
               </div>
 
               <div className="text-left space-y-1">
-                <label className="block text-xs font-semibold text-neutral-300">
+                <label className="block text-xs font-semibold text-slate-300">
                   Enter MTN MoMo / Airtel Number for Push Prompt:
                 </label>
                 <input
@@ -786,7 +923,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                   value={momoNumber}
                   onChange={(e) => setMomoNumber(e.target.value)}
                   placeholder="0788 000 000"
-                  className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-sm text-white focus:outline-none focus:border-red-500"
+                  className="w-full px-3 py-2 bg-[#0f172a] border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -795,7 +932,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                   type="button"
                   disabled={paymentProcessing}
                   onClick={handleConfirmPaymentAndPublish}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold text-xs tracking-wide shadow-lg flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs tracking-wide shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
                   {paymentProcessing ? (
                     <span>Initiating MoMo Push (*182#)...</span>
@@ -807,7 +944,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep('details')}
-                  className="w-full py-2 text-xs text-neutral-400 hover:text-neutral-200"
+                  className="w-full py-2 text-xs text-slate-400 hover:text-white transition-colors"
                 >
                   Back to edit car specs
                 </button>
@@ -818,22 +955,27 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
           {/* STEP 4: SUCCESS */}
           {step === 'success' && (
             <div className="text-center py-10 max-w-md mx-auto space-y-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-xl">
+              <div className="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto shadow-xl shadow-blue-950/80">
                 <Check className="w-8 h-8" />
               </div>
               <h4 className="text-2xl font-black text-white font-['Outfit',sans-serif]">
-                Vehicle Successfully Listed!
+                {isAdmin ? 'Vehicle Published (Admin VIP Free & Unlimited)!' : 'Vehicle Successfully Listed!'}
               </h4>
-              <p className="text-xs text-neutral-300 leading-relaxed">
-                Your <strong>{year} {make} {model}</strong> is now live on RwandaCarHub. Buyers across Kigali can call, chat on WhatsApp, or book a test drive immediately.
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Your <strong>{year} {make} {model}</strong> is now live on RwandaCarHub with verified seller credentials. Buyers across Kigali can call, chat on WhatsApp, or book a test drive immediately.
               </p>
-              <div className="p-3 bg-neutral-950 rounded-xl border border-neutral-800 text-xs text-neutral-400">
-                Watermark applied: <code className="text-red-400 font-mono">www.rwandacarhub.com</code>
+              {isAdmin && (
+                <div className="p-3 bg-blue-950/50 rounded-xl border border-blue-800 text-xs text-blue-200">
+                  ✓ Website Administrator Privilege: You have <strong>100% Free & Unlimited</strong> vehicle posts available.
+                </div>
+              )}
+              <div className="p-3 bg-[#0a0f1d] rounded-xl border border-slate-800 text-xs text-slate-400">
+                Watermark applied: <code className="text-blue-400 font-mono">www.rwandacarhub.com</code>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-xl bg-red-700 hover:bg-red-600 text-white text-xs font-bold transition-all shadow"
+                className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow"
               >
                 View Marketplace
               </button>

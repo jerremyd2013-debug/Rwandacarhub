@@ -1,5 +1,23 @@
 import { Vehicle, ListingPricingPlan } from '../types';
 
+export const ADMIN_UNLIMITED_PLAN: ListingPricingPlan = {
+  id: 'plan-admin',
+  name: 'Website Administrator VIP',
+  carLimit: 999999,
+  priceFrw: 0,
+  duration: 'Unlimited (100% Free)',
+  requiresAccount: true,
+  badge: 'Admin VIP (Free & Unlimited)',
+  features: [
+    'Unlimited vehicle posts (No daily quota restrictions)',
+    '100% Free • 0 Frw (No Mobile Money payment needed)',
+    'Official Website Administrator verified badge',
+    'High-priority search indexing across Kigali & Rwanda',
+    'Automatic www.rwandacarhub.com watermark protection',
+    'Instant live publication without moderation delays'
+  ]
+};
+
 export const LISTING_PRICING_PLANS: ListingPricingPlan[] = [
   {
     id: 'plan-free',

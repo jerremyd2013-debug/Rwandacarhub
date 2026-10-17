@@ -136,6 +136,7 @@ export interface UserAccount {
   avatar?: string;
   createdAt: string;
   approvalNotes?: string;
+  isUnlimitedPosts?: boolean;
 }
 
 export interface Testimonial {

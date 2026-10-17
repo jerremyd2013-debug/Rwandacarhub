@@ -11,7 +11,8 @@ export const INITIAL_ACCOUNTS: UserAccount[] = [
     accountType: 'agency',
     companyName: 'RwandaCarHub Head Office',
     createdAt: '2024-01-15',
-    approvalNotes: 'Platform Super Administrator with authority to approve accounts and manage listings.'
+    approvalNotes: 'Platform Super Administrator with authority to approve accounts and manage listings.',
+    isUnlimitedPosts: true
   },
   {
     id: 'usr-approved-1',
