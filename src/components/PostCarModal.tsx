@@ -12,7 +12,15 @@ import {
   ArrowLeft,
   UserCheck,
   CheckCircle2,
-  Lock
+  Lock,
+  Camera,
+  ImagePlus,
+  Trash2,
+  Star,
+  UploadCloud,
+  AlertCircle,
+  Eye,
+  Plus
 } from 'lucide-react';
 import { Vehicle, ListingPricingPlan, UserAccount } from '../types';
 import { LISTING_PRICING_PLANS, ADMIN_UNLIMITED_PLAN } from '../data/cars';
@@ -69,7 +77,131 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
   const [sellerName, setSellerName] = useState(currentUser?.name || '');
   const [sellerPhone, setSellerPhone] = useState(currentUser?.phone || '+250 788 225 193');
   const [description, setDescription] = useState('');
-  const [imageUrl, setImageUrl] = useState('https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=1000&auto=format&fit=crop&q=80');
+  
+  // Real Car Photos State
+  const [uploadedImages, setUploadedImages] = useState<string[]>([
+    'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=1000&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=1000&auto=format&fit=crop&q=80'
+  ]);
+  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [customUrlInput, setCustomUrlInput] = useState('');
+  const [showUrlAccordion, setShowUrlAccordion] = useState(false);
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const cameraInputRef = React.useRef<HTMLInputElement>(null);
+
+  // File Upload Processor using FileReader
+  const handleProcessFiles = (files: FileList | File[] | null) => {
+    if (!files || files.length === 0) return;
+    setUploadError(null);
+    setIsUploadingFiles(true);
+
+    const validFiles = Array.from(files).filter((f) => f.type.startsWith('image/'));
+    if (validFiles.length === 0) {
+      setUploadError('Please select valid picture files (JPG, PNG, WEBP, or HEIC).');
+      setIsUploadingFiles(false);
+      return;
+    }
+
+    const readers = validFiles.map((file) => {
+      return new Promise<string>((resolve, reject) => {
+        if (file.size > 15 * 1024 * 1024) {
+          reject(new Error(`"${file.name}" is over 15MB. Please choose a smaller file.`));
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (typeof reader.result === 'string') {
+            resolve(reader.result);
+          } else {
+            reject(new Error('Failed to read image data.'));
+          }
+        };
+        reader.onerror = () => reject(new Error('Error reading image file.'));
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.allSettled(readers).then((results) => {
+      const newImages: string[] = [];
+      results.forEach((res) => {
+        if (res.status === 'fulfilled' && res.value) {
+          newImages.push(res.value);
+        }
+      });
+
+      if (newImages.length > 0) {
+        setUploadedImages((prev) => {
+          // If existing is just the initial placeholder sample pair, replace it with real photos
+          const isInitialPlaceholder =
+            prev.length === 2 &&
+            prev[0].includes('unsplash.com') &&
+            prev[1].includes('unsplash.com');
+          if (isInitialPlaceholder) {
+            return newImages;
+          }
+          return [...prev, ...newImages];
+        });
+      }
+      setIsUploadingFiles(false);
+    });
+  };
+
+  const handleRemoveImage = (indexToRemove: number) => {
+    setUploadedImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleSetCoverImage = (indexToCover: number) => {
+    setUploadedImages((prev) => {
+      if (indexToCover === 0 || indexToCover >= prev.length) return prev;
+      const target = prev[indexToCover];
+      const remaining = prev.filter((_, idx) => idx !== indexToCover);
+      return [target, ...remaining];
+    });
+  };
+
+  const handleAddCustomUrl = () => {
+    const trimmed = customUrlInput.trim();
+    if (!trimmed) return;
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('data:image')) {
+      setUploadError('Please enter a valid web image URL (starting with https://).');
+      return;
+    }
+    setUploadError(null);
+    setUploadedImages((prev) => [...prev, trimmed]);
+    setCustomUrlInput('');
+  };
+
+  const handleLoadSampleSet = (preset: 'prado' | 'c200' | 'rav4' | 'hilux') => {
+    setUploadError(null);
+    if (preset === 'prado') {
+      setUploadedImages([
+        'https://images.unsplash.com/photo-1594502184342-2e12f877aa73?w=1000&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1000&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=1000&auto=format&fit=crop&q=80'
+      ]);
+    } else if (preset === 'c200') {
+      setUploadedImages([
+        'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=1000&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=1000&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1563720223185-11003d516935?w=1000&auto=format&fit=crop&q=80'
+      ]);
+    } else if (preset === 'rav4') {
+      setUploadedImages([
+        'https://images.unsplash.com/photo-1581540222194-0def2dda95b8?w=1000&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=1000&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1000&auto=format&fit=crop&q=80'
+      ]);
+    } else {
+      setUploadedImages([
+        'https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=1000&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=1000&auto=format&fit=crop&q=80'
+      ]);
+    }
+  };
 
   // Payment simulation
   const [momoNumber, setMomoNumber] = useState('0788225193');
@@ -93,6 +225,12 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
       alert('Please fill out the vehicle model and your seller name.');
       return;
     }
+    if (uploadedImages.length === 0) {
+      setUploadError('Please upload at least 1 real picture of the vehicle.');
+      const el = document.getElementById('real-pictures-upload-section');
+      el?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
     setStep('payment');
   };
 
@@ -101,6 +239,10 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
 
     setTimeout(() => {
       setPaymentProcessing(false);
+
+      const finalImages = uploadedImages.length > 0 
+        ? uploadedImages 
+        : ['https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=1000&auto=format&fit=crop&q=80'];
 
       const createdVehicle: Vehicle = {
         id: `user-car-${Date.now()}`,
@@ -127,10 +269,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
           reviewCount: 1,
           dealerName: currentUser?.companyName || sellerName
         },
-        images: [
-          imageUrl,
-          'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=1000&auto=format&fit=crop&q=80'
-        ],
+        images: finalImages,
         features: [
           'Air Conditioning',
           'Power Steering',
@@ -490,11 +629,11 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
               {/* Grid 1: Make, Model, Year, Body Type */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Make *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Make *</label>
                   <select
                     value={make}
                     onChange={(e) => setMake(e.target.value)}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
                   >
                     <option value="Toyota">Toyota</option>
                     <option value="Mercedes-Benz">Mercedes-Benz</option>
@@ -510,23 +649,23 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Model *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Model *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. RAV4 / Prado / Hilux"
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Year *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Year *</label>
                   <select
                     value={year}
                     onChange={(e) => setYear(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
                   >
                     {[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015].map((yr) => (
                       <option key={yr} value={yr}>{yr}</option>
@@ -535,11 +674,11 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Body Style</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Body Style</label>
                   <select
                     value={bodyType}
                     onChange={(e) => setBodyType(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
                   >
                     <option value="SUV">SUV</option>
                     <option value="Sedan">Sedan</option>
@@ -554,7 +693,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
               {/* Grid 2: Price, Mileage, Fuel, Transmission */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Price in RWF * {purpose !== 'buy' ? '(per day/month)' : ''}
                   </label>
                   <input
@@ -563,28 +702,28 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                     step={50000}
                     value={priceRwf}
                     onChange={(e) => setPriceRwf(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white font-bold"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white font-bold focus:outline-none focus:border-blue-500"
                   />
-                  <span className="text-[10px] text-neutral-400">~ ${calculatedUsd.toLocaleString()} USD</span>
+                  <span className="text-[10px] text-slate-400">~ ${calculatedUsd.toLocaleString()} USD</span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Mileage (km) *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Mileage (km) *</label>
                   <input
                     type="number"
                     required
                     value={mileageKm}
                     onChange={(e) => setMileageKm(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Transmission</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Transmission</label>
                   <select
                     value={transmission}
                     onChange={(e) => setTransmission(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
                   >
                     <option value="Automatic">Automatic</option>
                     <option value="Manual">Manual</option>
@@ -592,11 +731,11 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Fuel Type</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Fuel Type</label>
                   <select
                     value={fuelType}
                     onChange={(e) => setFuelType(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
                   >
                     <option value="Petrol">Petrol</option>
                     <option value="Diesel">Diesel</option>
@@ -609,11 +748,11 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
               {/* Grid 3: Condition, Kigali Location, Seller Name & Phone */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Condition</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Condition</label>
                   <select
                     value={condition}
                     onChange={(e) => setCondition(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
                   >
                     <option value="Foreign Used">Foreign Used (Import)</option>
                     <option value="Local Used">Local Used (Rwanda)</option>
@@ -622,11 +761,11 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Kigali Location *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Kigali Location *</label>
                   <select
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
                   >
                     <option value="Kigali, Kicukiro (Sonatubes)">Kicukiro (Sonatubes)</option>
                     <option value="Kigali, Gasabo (Remera)">Gasabo (Remera)</option>
@@ -638,69 +777,355 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Seller / Dealer Name *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Seller / Dealer Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="Your Name or Dealership"
                     value={sellerName}
                     onChange={(e) => setSellerName(e.target.value)}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Contact Phone / WhatsApp *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Contact Phone / WhatsApp *</label>
                   <input
                     type="tel"
                     required
                     value={sellerPhone}
                     onChange={(e) => setSellerPhone(e.target.value)}
-                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </div>
 
-              {/* Photo Preview & Watermark Notice */}
-              <div className="p-3 bg-neutral-950 rounded-xl border border-neutral-800 space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-neutral-300">Vehicle Photo URL</label>
-                  <span className="text-[10px] text-emerald-400 font-semibold">
-                    ✓ Watermark "www.rwandacarhub.com" automatically attached
-                  </span>
+              {/* REAL VEHICLE PICTURES UPLOAD CENTER */}
+              <div id="real-pictures-upload-section" className="p-4 sm:p-5 bg-[#0a0f1d] rounded-2xl border border-slate-800 space-y-4">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <ImagePlus className="w-4 h-4 text-blue-400" />
+                      <h5 className="text-sm font-bold text-white font-['Outfit',sans-serif]">
+                        Real Vehicle Pictures & Gallery *
+                      </h5>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-950 text-blue-300 border border-blue-800">
+                        {uploadedImages.length} {uploadedImages.length === 1 ? 'Photo' : 'Photos'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Upload clear real pictures of the actual car in Rwanda. The first picture will be your main marketplace cover photo.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-[11px] text-blue-400 font-semibold bg-blue-950/40 px-2.5 py-1 rounded-lg border border-blue-800/60 self-start sm:self-auto">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Watermark "www.rwandacarhub.com" automatically attached</span>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    className="flex-1 px-3 py-1.5 bg-neutral-900 border border-neutral-700 rounded-lg text-xs text-white"
-                  />
+
+                {/* Upload Error Banner */}
+                {uploadError && (
+                  <div className="p-3 bg-red-950/80 border border-red-700/80 rounded-xl text-xs text-red-200 flex items-center justify-between gap-2 animate-in fade-in">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                      <span>{uploadError}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setUploadError(null)}
+                      className="text-slate-400 hover:text-white"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Hidden File Inputs */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/png,image/jpeg,image/webp,image/jpg"
+                  multiple
+                  onChange={(e) => {
+                    handleProcessFiles(e.target.files);
+                    e.target.value = '';
+                  }}
+                  className="hidden"
+                />
+                <input
+                  type="file"
+                  ref={cameraInputRef}
+                  accept="image/*"
+                  capture="environment"
+                  onChange={(e) => {
+                    handleProcessFiles(e.target.files);
+                    e.target.value = '';
+                  }}
+                  className="hidden"
+                />
+
+                {/* Interactive Drag & Drop / Upload Space */}
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(true);
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(false);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(false);
+                    handleProcessFiles(e.dataTransfer.files);
+                  }}
+                  className={`relative p-6 sm:p-8 rounded-2xl border-2 border-dashed transition-all text-center flex flex-col items-center justify-center gap-3 cursor-pointer ${
+                    isDragOver
+                      ? 'border-blue-500 bg-blue-950/40 shadow-xl shadow-blue-950/50'
+                      : 'border-slate-700 hover:border-blue-500/80 bg-[#0f172a]/60 hover:bg-[#0f172a]'
+                  }`}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform shadow-md">
+                    {isUploadingFiles ? (
+                      <Sparkles className="w-6 h-6 animate-spin text-blue-400" />
+                    ) : (
+                      <UploadCloud className="w-6 h-6 text-blue-400" />
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-white">
+                      {isUploadingFiles ? (
+                        <span>Processing & Optimizing Uploaded Pictures...</span>
+                      ) : (
+                        <span>Drop Real Car Pictures Here or <span className="text-blue-400 underline">Browse Files</span></span>
+                      )}
+                    </p>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto">
+                      Select front, rear, side angles, driver cockpit, dashboard & engine. Supports JPG, PNG, WEBP (up to 15MB each).
+                    </p>
+                  </div>
+
+                  {/* Upload Action Buttons inside dropzone */}
+                  <div className="flex items-center gap-2 pt-1 flex-wrap justify-center" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-950 active:scale-95 transition-all"
+                    >
+                      <ImagePlus className="w-3.5 h-3.5" />
+                      <span>Choose Pictures From Device</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => cameraInputRef.current?.click()}
+                      className="px-3.5 py-2 rounded-xl bg-[#0a0f1d] hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700 text-xs font-semibold flex items-center gap-1.5 active:scale-95 transition-all"
+                      title="Use smartphone camera to take a real photo now"
+                    >
+                      <Camera className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Snap Photo (Camera)</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* RECOMMENDED PHOTO ANGLES GUIDE */}
+                <div className="p-3 bg-[#0f172a] rounded-xl border border-slate-800/80 space-y-1.5">
+                  <div className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Recommended Shots For Faster Buyer Inquiries in Kigali:</span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-400">
+                    <div className="p-1.5 rounded-lg bg-[#0a0f1d] border border-slate-800/80 flex items-center gap-1.5">
+                      <Check className="w-3 h-3 text-blue-400 shrink-0" />
+                      <span>1. Front 3/4 Exterior</span>
+                    </div>
+                    <div className="p-1.5 rounded-lg bg-[#0a0f1d] border border-slate-800/80 flex items-center gap-1.5">
+                      <Check className="w-3 h-3 text-blue-400 shrink-0" />
+                      <span>2. Rear & License Plate</span>
+                    </div>
+                    <div className="p-1.5 rounded-lg bg-[#0a0f1d] border border-slate-800/80 flex items-center gap-1.5">
+                      <Check className="w-3 h-3 text-blue-400 shrink-0" />
+                      <span>3. Cockpit & Odometer</span>
+                    </div>
+                    <div className="p-1.5 rounded-lg bg-[#0a0f1d] border border-slate-800/80 flex items-center gap-1.5">
+                      <Check className="w-3 h-3 text-blue-400 shrink-0" />
+                      <span>4. Clean Seats & Engine</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* UPLOADED PICTURES PREVIEW GRID */}
+                {uploadedImages.length > 0 && (
+                  <div className="space-y-2.5 pt-1">
+                    <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
+                      <span>Uploaded Photos ({uploadedImages.length})</span>
+                      <span className="text-[11px] text-slate-400">Click "Set Cover" to change your main marketplace photo</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                      {uploadedImages.map((imgSrc, idx) => {
+                        const isCover = idx === 0;
+                        return (
+                          <div
+                            key={idx}
+                            className={`group relative rounded-xl overflow-hidden border-2 transition-all bg-[#0f172a] flex flex-col ${
+                              isCover 
+                                ? 'border-blue-500 shadow-lg shadow-blue-950/60 ring-2 ring-blue-500/20' 
+                                : 'border-slate-800 hover:border-slate-700'
+                            }`}
+                          >
+                            {/* Image container */}
+                            <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/60">
+                              <img
+                                src={imgSrc}
+                                alt={`Vehicle photo ${idx + 1}`}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                referrerPolicy="no-referrer"
+                              />
+
+                              {/* Index badge */}
+                              <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[10px] font-black text-white border border-white/20">
+                                #{idx + 1}
+                              </div>
+
+                              {/* Cover photo badge */}
+                              {isCover ? (
+                                <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider shadow-md flex items-center gap-1">
+                                  <Star className="w-2.5 h-2.5 fill-current" />
+                                  <span>Cover Photo</span>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetCoverImage(idx)}
+                                  className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-slate-900/90 hover:bg-blue-600 text-slate-200 hover:text-white text-[10px] font-bold border border-slate-700 hover:border-blue-500 opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1 shadow-md"
+                                  title="Make this photo the main marketplace cover photo"
+                                >
+                                  <Star className="w-2.5 h-2.5" />
+                                  <span>Set Cover</span>
+                                </button>
+                              )}
+
+                              {/* Official Watermark Preview Stamp */}
+                              <div className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-md text-[9px] font-mono text-blue-400 border border-blue-500/30 flex items-center gap-1">
+                                <span>www.rwandacarhub.com</span>
+                              </div>
+                            </div>
+
+                            {/* Card Footer actions */}
+                            <div className="p-2 bg-[#0a0f1d] border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+                              {isCover ? (
+                                <span className="text-[10px] text-blue-400 font-bold">Primary Listing Cover</span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetCoverImage(idx)}
+                                  className="text-[10px] text-slate-400 hover:text-blue-400 font-medium transition-colors"
+                                >
+                                  Make Cover
+                                </button>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveImage(idx)}
+                                className="p-1 rounded text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"
+                                title="Remove this photo"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* ACCORDION: WEB URL INPUT & ONE-CLICK REALISTIC DEMO SETS */}
+                <div className="pt-1 border-t border-slate-800/80">
                   <button
                     type="button"
-                    onClick={() => setImageUrl('https://images.unsplash.com/photo-1594502184342-2e12f877aa73?w=1000&auto=format&fit=crop&q=80')}
-                    className="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs whitespace-nowrap"
+                    onClick={() => setShowUrlAccordion(!showUrlAccordion)}
+                    className="text-xs font-semibold text-slate-400 hover:text-slate-200 flex items-center gap-1 transition-colors"
                   >
-                    Sample SUV
+                    <span>{showUrlAccordion ? '▾ Hide link & sample photo options' : '▸ Or paste web photo URL / Load sample pictures'}</span>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setImageUrl('https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=1000&auto=format&fit=crop&q=80')}
-                    className="px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs whitespace-nowrap"
-                  >
-                    Sample Luxury
-                  </button>
+
+                  {showUrlAccordion && (
+                    <div className="mt-3 p-3.5 rounded-xl bg-[#0f172a] border border-slate-800 space-y-3 animate-in fade-in">
+                      <div className="space-y-1">
+                        <label className="block text-xs font-semibold text-slate-300">
+                          Add Photo via Web URL:
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="url"
+                            value={customUrlInput}
+                            onChange={(e) => setCustomUrlInput(e.target.value)}
+                            placeholder="https://example.com/car-photo.jpg"
+                            className="flex-1 px-3 py-1.5 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleAddCustomUrl}
+                            className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors"
+                          >
+                            Add Photo
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5 pt-1 border-t border-slate-800/60">
+                        <span className="text-[11px] font-semibold text-slate-400">Load Kigali verified sample multi-photos (3-4 angles):</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => handleLoadSampleSet('prado')}
+                            className="px-2.5 py-1 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium transition-colors"
+                          >
+                            Toyota Prado TX-L (3 angles)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleLoadSampleSet('c200')}
+                            className="px-2.5 py-1 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium transition-colors"
+                          >
+                            Mercedes C200 AMG (3 angles)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleLoadSampleSet('rav4')}
+                            className="px-2.5 py-1 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium transition-colors"
+                          >
+                            Toyota RAV4 4x4 (3 angles)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleLoadSampleSet('hilux')}
+                            className="px-2.5 py-1 rounded-lg bg-[#0a0f1d] hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium transition-colors"
+                          >
+                            Hilux Double Cabin (2 angles)
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Description (Optional)</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Description (Optional)</label>
                 <textarea
                   rows={2}
                   placeholder="Mention condition, service history, RRA duty clearance, features..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3 py-2 bg-neutral-950 border border-neutral-700 rounded-lg text-xs text-white"
+                  className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -954,13 +1379,31 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
 
           {/* STEP 4: SUCCESS */}
           {step === 'success' && (
-            <div className="text-center py-10 max-w-md mx-auto space-y-4">
-              <div className="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto shadow-xl shadow-blue-950/80">
-                <Check className="w-8 h-8" />
+            <div className="text-center py-6 max-w-md mx-auto space-y-4">
+              <div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto shadow-xl shadow-blue-950/80">
+                <Check className="w-7 h-7" />
               </div>
-              <h4 className="text-2xl font-black text-white font-['Outfit',sans-serif]">
+              <h4 className="text-xl sm:text-2xl font-black text-white font-['Outfit',sans-serif]">
                 {isAdmin ? 'Vehicle Published (Admin VIP Free & Unlimited)!' : 'Vehicle Successfully Listed!'}
               </h4>
+
+              {/* Published Vehicle Photo Card with watermark preview */}
+              {uploadedImages[0] && (
+                <div className="relative rounded-2xl overflow-hidden border border-slate-800 shadow-xl max-w-xs mx-auto">
+                  <img
+                    src={uploadedImages[0]}
+                    alt={`${year} ${make} ${model}`}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/85 backdrop-blur-md text-[10px] font-mono text-blue-400 border border-blue-500/40">
+                    www.rwandacarhub.com
+                  </div>
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-blue-600/90 text-white text-[10px] font-bold">
+                    {uploadedImages.length} Real Photo{uploadedImages.length > 1 ? 's' : ''} Live
+                  </div>
+                </div>
+              )}
+
               <p className="text-xs text-slate-300 leading-relaxed">
                 Your <strong>{year} {make} {model}</strong> is now live on RwandaCarHub with verified seller credentials. Buyers across Kigali can call, chat on WhatsApp, or book a test drive immediately.
               </p>
@@ -969,15 +1412,15 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                   ✓ Website Administrator Privilege: You have <strong>100% Free & Unlimited</strong> vehicle posts available.
                 </div>
               )}
-              <div className="p-3 bg-[#0a0f1d] rounded-xl border border-slate-800 text-xs text-slate-400">
+              <div className="p-2.5 bg-[#0a0f1d] rounded-xl border border-slate-800 text-xs text-slate-400">
                 Watermark applied: <code className="text-blue-400 font-mono">www.rwandacarhub.com</code>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow"
+                className="w-full sm:w-auto px-8 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow"
               >
-                View Marketplace
+                View in Marketplace
               </button>
             </div>
           )}
