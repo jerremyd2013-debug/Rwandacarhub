@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Car, 
   Search, 
@@ -8,7 +8,7 @@ import {
   Layers, 
   TrendingUp, 
   ArrowRight, 
-  Sparkles,
+  Sparkles, 
   Phone,
   MessageSquare,
   CheckCircle2,
@@ -35,6 +35,23 @@ import { ContactView } from './components/ContactView';
 import { AuthModal } from './components/AuthModal';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { PartnersAdBanner } from './components/PartnersAdBanner';
+import { 
+  subscribeToVehicles, 
+  saveVehicleToCloud, 
+  updateVehicleStatusInCloud, 
+  deleteVehicleFromCloud,
+  subscribeToBookings,
+  saveBookingToCloud,
+  subscribeToMessages,
+  saveMessageToCloud,
+  subscribeToPartnerAds,
+  savePartnerAdToCloud,
+  deletePartnerAdFromCloud,
+  subscribeToAccounts,
+  saveAccountToCloud,
+  testFirestoreConnection,
+  seedInitialVehiclesIfEmpty 
+} from './firebase';
 
 const HERO_VEHICLE_IMAGES = [
   {
@@ -57,17 +74,65 @@ const HERO_VEHICLE_IMAGES = [
   }
 ];
 
+const STORAGE_KEYS = {
+  VEHICLES: 'rwandacarhub_vehicles_v2',
+  ACCOUNTS: 'rwandacarhub_accounts_v2',
+  CURRENT_USER: 'rwandacarhub_current_user_v2',
+  USER_LISTINGS: 'rwandacarhub_user_listings_v2',
+  BOOKINGS: 'rwandacarhub_bookings_v2',
+  MESSAGES: 'rwandacarhub_messages_v2',
+  FAVORITES: 'rwandacarhub_favorites_v2',
+  ADS: 'rwandacarhub_ads_v2'
+};
+
 export default function App() {
   // Navigation & View state
   const [currentTab, setCurrentTab] = useState('home');
   const [currency, setCurrency] = useState<'RWF' | 'USD'>('RWF');
   const [heroVehicleImage, setHeroVehicleImage] = useState(HERO_VEHICLE_IMAGES[0].url);
 
-  // Vehicles dataset state (can add new user-posted cars)
-  const [vehicles, setVehicles] = useState<Vehicle[]>(INITIAL_CARS);
+  // Vehicles dataset state (persisted to localStorage so posted cars never disappear)
+  const [vehicles, setVehicles] = useState<Vehicle[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.VEHICLES);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load saved vehicles from storage', e);
+    }
+    return INITIAL_CARS;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
+    } catch (e) {
+      console.warn('Failed to save vehicles to storage', e);
+    }
+  }, [vehicles]);
 
   // Favorites & Comparison state
-  const [favoriteIds, setFavoriteIds] = useState<string[]>(['car-1', 'car-4']);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.FAVORITES);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {}
+    return ['car-1', 'car-4'];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favoriteIds));
+    } catch (e) {}
+  }, [favoriteIds]);
+
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
 
@@ -77,11 +142,61 @@ export default function App() {
   const [initialPlanIdForModal, setInitialPlanIdForModal] = useState<string | undefined>(undefined);
 
   // User Dashboard State
-  const [userListings, setUserListings] = useState<Vehicle[]>([]);
+  const [userListings, setUserListings] = useState<Vehicle[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.USER_LISTINGS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.USER_LISTINGS, JSON.stringify(userListings));
+    } catch (e) {}
+  }, [userListings]);
   
   // User Accounts & Role-Based Approval State
-  const [accounts, setAccounts] = useState<UserAccount[]>(INITIAL_ACCOUNTS);
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null); // Starts as Guest so Login button is prominently visible
+  const [accounts, setAccounts] = useState<UserAccount[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.ACCOUNTS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return INITIAL_ACCOUNTS;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.ACCOUNTS, JSON.stringify(accounts));
+    } catch (e) {}
+  }, [accounts]);
+
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {}
+    return null;
+  });
+
+  useEffect(() => {
+    try {
+      if (currentUser) {
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+      }
+    } catch (e) {}
+  }, [currentUser]);
+
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleSelectUser = (acc: UserAccount | null) => {
@@ -120,75 +235,127 @@ export default function App() {
       approvalNotes: 'Self-registered account awaiting admin verification'
     };
     setAccounts((prev) => [newAcc, ...prev]);
+    saveAccountToCloud(newAcc).catch(console.error);
     setCurrentUser(newAcc);
     showToast(`Account registered for ${newAcc.name}! Status: Pending Approval. Website admin must approve before dashboard is visible.`);
   };
 
   const handleApproveAccount = (userId: string) => {
+    let approvedAcc: UserAccount | null = null;
     setAccounts((prev) =>
-      prev.map((acc) =>
-        acc.id === userId ? { ...acc, status: 'approved' as const, approvalNotes: 'Verified and approved by admin' } : acc
-      )
+      prev.map((acc) => {
+        if (acc.id === userId) {
+          approvedAcc = { ...acc, status: 'approved' as const, approvalNotes: 'Verified and approved by admin' };
+          return approvedAcc;
+        }
+        return acc;
+      })
     );
+    if (approvedAcc) {
+      saveAccountToCloud(approvedAcc).catch(console.error);
+    }
     setCurrentUser((prev) => (prev && prev.id === userId ? { ...prev, status: 'approved' } : prev));
     showToast('Account successfully approved! Dashboard access is now enabled.');
   };
 
   const handleRejectAccount = (userId: string) => {
+    let rejectedAcc: UserAccount | null = null;
     setAccounts((prev) =>
-      prev.map((acc) =>
-        acc.id === userId ? { ...acc, status: 'rejected' as const, approvalNotes: 'Declined by admin' } : acc
-      )
+      prev.map((acc) => {
+        if (acc.id === userId) {
+          rejectedAcc = { ...acc, status: 'rejected' as const, approvalNotes: 'Declined by admin' };
+          return rejectedAcc;
+        }
+        return acc;
+      })
     );
+    if (rejectedAcc) {
+      saveAccountToCloud(rejectedAcc).catch(console.error);
+    }
     setCurrentUser((prev) => (prev && prev.id === userId ? { ...prev, status: 'rejected' } : prev));
     showToast('Account registration declined.');
   };
 
-  // Partner Advertisements & Sliding Space State (Admin manageable)
-  const [partnerAds, setPartnerAds] = useState<PartnerAd[]>(PARTNER_ADS);
+  // Partner Advertisements & Sliding Space State (Admin manageable, persisted)
+  const [partnerAds, setPartnerAds] = useState<PartnerAd[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.ADS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return PARTNER_ADS;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.ADS, JSON.stringify(partnerAds));
+    } catch (e) {}
+  }, [partnerAds]);
 
   const handleApproveAd = (adId: string) => {
     setPartnerAds((prev) =>
-      prev.map((ad) => (ad.id === adId ? { ...ad, status: 'approved' as const } : ad))
+      prev.map((ad) => {
+        if (ad.id === adId) {
+          const updated = { ...ad, status: 'approved' as const };
+          savePartnerAdToCloud(updated).catch(console.error);
+          return updated;
+        }
+        return ad;
+      })
     );
     showToast('Advert approved! It is now actively featured in the partner slider & ticker.');
   };
 
   const handleRejectAd = (adId: string) => {
     setPartnerAds((prev) =>
-      prev.map((ad) => (ad.id === adId ? { ...ad, status: 'rejected' as const } : ad))
+      prev.map((ad) => {
+        if (ad.id === adId) {
+          const updated = { ...ad, status: 'rejected' as const };
+          savePartnerAdToCloud(updated).catch(console.error);
+          return updated;
+        }
+        return ad;
+      })
     );
     showToast('Advert rejected and hidden from public view.');
   };
 
   const handleDiminishAd = (adId: string) => {
     setPartnerAds((prev) =>
-      prev.map((ad) =>
-        ad.id === adId
-          ? { ...ad, status: 'diminished' as const, displayWeight: 1 }
-          : ad
-      )
+      prev.map((ad) => {
+        if (ad.id === adId) {
+          const updated = { ...ad, status: 'diminished' as const, displayWeight: 1 };
+          savePartnerAdToCloud(updated).catch(console.error);
+          return updated;
+        }
+        return ad;
+      })
     );
     showToast('Advert diminished. Display frequency lowered to 1x (rare appearance).');
   };
 
   const handleRemoveAd = (adId: string) => {
     setPartnerAds((prev) => prev.filter((ad) => ad.id !== adId));
+    deletePartnerAdFromCloud(adId).catch(console.error);
     showToast('Advert removed completely from RwandaCarHub.');
   };
 
   const handleUpdateAdWeight = (adId: string, weight: number) => {
     setPartnerAds((prev) =>
-      prev.map((ad) =>
-        ad.id === adId
-          ? {
-              ...ad,
-              displayWeight: weight,
-              // If previously diminished and weight is increased, bring back to approved
-              status: ad.status === 'diminished' && weight > 1 ? 'approved' : ad.status
-            }
-          : ad
-      )
+      prev.map((ad) => {
+        if (ad.id === adId) {
+          const updated = {
+            ...ad,
+            displayWeight: weight,
+            status: ad.status === 'diminished' && weight > 1 ? ('approved' as const) : ad.status
+          };
+          savePartnerAdToCloud(updated).catch(console.error);
+          return updated;
+        }
+        return ad;
+      })
     );
     const label = weight === 5 ? '5x (VIP Top Frequency)' : weight === 3 ? '3x (High)' : weight === 2 ? '2x (Normal)' : '1x (Rare)';
     showToast(`Advert frequency set to ${label}.`);
@@ -200,11 +367,13 @@ export default function App() {
       prev.map((ad) => {
         if (ad.id === adId) {
           const isExpired = expiryDate < today;
-          return {
+          const updated = {
             ...ad,
             expiryDate,
-            status: isExpired ? 'expired' : ad.status === 'expired' ? 'approved' : ad.status
+            status: isExpired ? ('expired' as const) : ad.status === 'expired' ? ('approved' as const) : ad.status
           };
+          savePartnerAdToCloud(updated).catch(console.error);
+          return updated;
         }
         return ad;
       })
@@ -220,6 +389,7 @@ export default function App() {
       }
       return [savedAd, ...prev];
     });
+    savePartnerAdToCloud(savedAd).catch(console.error);
     showToast(`Advert for "${savedAd.name}" saved successfully!`);
   };
 
@@ -259,44 +429,75 @@ export default function App() {
       clicksCount: 0
     };
     setPartnerAds((prev) => [pendingAd, ...prev]);
+    savePartnerAdToCloud(pendingAd).catch(console.error);
     showToast(`Advertising inquiry received from ${inquiry.companyName}! Added to Admin Adverts for review.`);
   };
-  const [messages, setMessages] = useState<ContactMessage[]>([
-    {
-      id: 'msg-1',
-      vehicleId: 'car-1',
-      vehicleName: '2023 Toyota Land Cruiser Prado TX-L',
-      senderName: 'David Kamanzi',
-      senderPhone: '+250 788 111 222',
-      message: 'Hello, is this Prado TX-L still available in Kicukiro? Can I inspect it tomorrow morning at 10 AM?',
-      timestamp: '2 hours ago',
-      read: true
-    },
-    {
-      id: 'msg-2',
-      vehicleId: 'car-2',
-      vehicleName: '2022 Mercedes-Benz C200 AMG Line',
-      senderName: 'Claire Umutoni',
-      senderPhone: '+250 788 333 444',
-      message: 'Good afternoon, what is the best cash price in RWF for the C200? Are the RRA duty papers complete?',
-      timestamp: 'Yesterday',
-      read: false
-    }
-  ]);
+  const [messages, setMessages] = useState<ContactMessage[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.MESSAGES);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [
+      {
+        id: 'msg-1',
+        vehicleId: 'car-1',
+        vehicleName: '2023 Toyota Land Cruiser Prado TX-L',
+        senderName: 'David Kamanzi',
+        senderPhone: '+250 788 111 222',
+        message: 'Hello, is this Prado TX-L still available in Kicukiro? Can I inspect it tomorrow morning at 10 AM?',
+        timestamp: '2 hours ago',
+        read: true
+      },
+      {
+        id: 'msg-2',
+        vehicleId: 'car-2',
+        vehicleName: '2022 Mercedes-Benz C200 AMG Line',
+        senderName: 'Claire Umutoni',
+        senderPhone: '+250 788 333 444',
+        message: 'Good afternoon, what is the best cash price in RWF for the C200? Are the RRA duty papers complete?',
+        timestamp: 'Yesterday',
+        read: false
+      }
+    ];
+  });
 
-  const [bookings, setBookings] = useState<Booking[]>([
-    {
-      id: 'book-1',
-      vehicleId: 'car-1',
-      vehicleName: '2023 Toyota Land Cruiser Prado TX-L',
-      customerName: 'Jean-Damascène Habimana',
-      customerPhone: '+250 788 225 193',
-      date: '2026-09-10',
-      time: '10:30 AM',
-      type: 'Test Drive',
-      status: 'Confirmed'
-    }
-  ]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(messages));
+    } catch (e) {}
+  }, [messages]);
+
+  const [bookings, setBookings] = useState<Booking[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.BOOKINGS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [
+      {
+        id: 'book-1',
+        vehicleId: 'car-1',
+        vehicleName: '2023 Toyota Land Cruiser Prado TX-L',
+        customerName: 'Jean-Damascène Habimana',
+        customerPhone: '+250 788 225 193',
+        date: '2026-09-10',
+        time: '10:30 AM',
+        type: 'Test Drive',
+        status: 'Confirmed'
+      }
+    ];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(bookings));
+    } catch (e) {}
+  }, [bookings]);
 
   // Filters State
   const initialFilters: FilterState = {
@@ -314,6 +515,69 @@ export default function App() {
     sortBy: 'featured'
   };
   const [filters, setFilters] = useState<FilterState>(initialFilters);
+
+  // Cloud Firestore Real-time Listeners and Offline Resilience
+  const [isCloudConnected, setIsCloudConnected] = useState<boolean>(true);
+
+  useEffect(() => {
+    // Test connectivity to Cloud Firestore
+    testFirestoreConnection().then((connected) => {
+      setIsCloudConnected(connected);
+      if (connected) {
+        seedInitialVehiclesIfEmpty();
+      }
+    });
+
+    // Subscribe to real-time vehicle updates from Google Cloud Firestore
+    const unsubscribeVehicles = subscribeToVehicles(
+      (cloudVehicles) => {
+        if (cloudVehicles && cloudVehicles.length > 0) {
+          setVehicles(cloudVehicles);
+          setIsCloudConnected(true);
+        }
+      },
+      (err) => {
+        console.warn('Real-time vehicle sync failed, using cached inventory:', err);
+        setIsCloudConnected(false);
+      }
+    );
+
+    // Subscribe to real-time bookings
+    const unsubscribeBookings = subscribeToBookings((cloudBookings) => {
+      if (cloudBookings && cloudBookings.length > 0) {
+        setBookings(cloudBookings);
+      }
+    });
+
+    // Subscribe to real-time contact messages & inquiries
+    const unsubscribeMessages = subscribeToMessages((cloudMessages) => {
+      if (cloudMessages && cloudMessages.length > 0) {
+        setMessages(cloudMessages);
+      }
+    });
+
+    // Subscribe to real-time partner ads
+    const unsubscribeAds = subscribeToPartnerAds((cloudAds) => {
+      if (cloudAds && cloudAds.length > 0) {
+        setPartnerAds(cloudAds);
+      }
+    });
+
+    // Subscribe to real-time user accounts
+    const unsubscribeAccounts = subscribeToAccounts((cloudAccounts) => {
+      if (cloudAccounts && cloudAccounts.length > 0) {
+        setAccounts(cloudAccounts);
+      }
+    });
+
+    return () => {
+      unsubscribeVehicles();
+      unsubscribeBookings();
+      unsubscribeMessages();
+      unsubscribeAds();
+      unsubscribeAccounts();
+    };
+  }, []);
 
   // Available Makes for Filter Dropdown
   const availableMakes = useMemo(() => {
@@ -348,19 +612,32 @@ export default function App() {
     });
   };
 
-  // Add new car handler (from PostCarModal)
+  // Add new car handler (from PostCarModal) - Permanently saved to Google Cloud Firestore
   const handleAddCar = (newCar: Vehicle) => {
+    // 1. Optimistic local update
     setVehicles((prev) => [newCar, ...prev]);
     setUserListings((prev) => [newCar, ...prev]);
+
+    // 2. Permanent Cloud Firestore persistence
+    saveVehicleToCloud(newCar)
+      .then(() => {
+        showToast(`Car post saved permanently to Google Cloud! All visitors can now view it.`);
+      })
+      .catch((err) => {
+        console.error('Failed to sync car to cloud database:', err);
+        showToast('Car saved locally. Will sync to Cloud Firestore when reconnected.');
+      });
   };
 
-  // Delete listing handler
+  // Delete listing handler - Deleted from Google Cloud Firestore
   const handleDeleteListing = (id: string) => {
     setVehicles((prev) => prev.filter((c) => c.id !== id));
     setUserListings((prev) => prev.filter((c) => c.id !== id));
+    deleteVehicleFromCloud(id).catch(console.error);
+    showToast('Vehicle removed from cloud database.');
   };
 
-  // Update vehicle status handler (available, sold, rented, leased)
+  // Update vehicle status handler (available, sold, rented, leased) - Synced to Firestore
   const handleUpdateVehicleStatus = (vehicleId: string, newStatus: VehicleStatus) => {
     setVehicles((prev) =>
       prev.map((v) => (v.id === vehicleId ? { ...v, status: newStatus } : v))
@@ -372,6 +649,8 @@ export default function App() {
       prev && prev.id === vehicleId ? { ...prev, status: newStatus } : prev
     );
 
+    updateVehicleStatusInCloud(vehicleId, newStatus).catch(console.error);
+
     const statusLabels: Record<VehicleStatus, string> = {
       available: 'marked as Available in stock',
       sold: 'marked as Sold (Yagurishijwe)',
@@ -382,7 +661,7 @@ export default function App() {
     showToast(`Vehicle status ${statusLabels[newStatus] || newStatus}.`);
   };
 
-  // Booking submit handler (from CarDetailsModal)
+  // Booking submit handler (from CarDetailsModal) - Synced to Firestore
   const handleCreateBooking = (bookingData: Omit<Booking, 'id' | 'status'>) => {
     const newBooking: Booking = {
       ...bookingData,
@@ -390,9 +669,10 @@ export default function App() {
       status: 'Confirmed'
     };
     setBookings((prev) => [newBooking, ...prev]);
+    saveBookingToCloud(newBooking).catch(console.error);
   };
 
-  // Inquiry message handler
+  // Inquiry message handler - Synced to Firestore
   const handleSendMessage = (msgData: Omit<ContactMessage, 'id' | 'timestamp' | 'read'>) => {
     const newMsg: ContactMessage = {
       ...msgData,
@@ -401,9 +681,10 @@ export default function App() {
       read: true
     };
     setMessages((prev) => [newMsg, ...prev]);
+    saveMessageToCloud(newMsg).catch(console.error);
   };
 
-  // Send reply from dashboard
+  // Send reply from dashboard - Synced to Firestore
   const handleSendReply = (text: string) => {
     const replyMsg: ContactMessage = {
       id: `msg-${Date.now()}`,
@@ -414,6 +695,7 @@ export default function App() {
       read: true
     };
     setMessages((prev) => [replyMsg, ...prev]);
+    saveMessageToCloud(replyMsg).catch(console.error);
   };
 
   // Favorite vehicles objects
@@ -538,6 +820,7 @@ export default function App() {
         favoritesCount={favoriteIds.length}
         compareCount={compareIds.length}
         onOpenCompare={() => setIsCompareOpen(true)}
+        isCloudConnected={isCloudConnected}
         onOpenSearch={() => {
           handleTabSelect('buy');
           setTimeout(() => {

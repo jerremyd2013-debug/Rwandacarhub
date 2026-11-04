@@ -30,6 +30,7 @@ interface HeaderProps {
   currentUser: UserAccount | null;
   onOpenAuthModal: () => void;
   pendingApprovalsCount?: number;
+  isCloudConnected?: boolean;
   // Optional backwards compatibility props
   favoritesCount?: number;
   compareCount?: number;
@@ -47,7 +48,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleCurrency,
   currentUser,
   onOpenAuthModal,
-  pendingApprovalsCount = 0
+  pendingApprovalsCount = 0,
+  isCloudConnected = true
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [carsDropdownOpen, setCarsDropdownOpen] = useState(false);
@@ -131,6 +133,19 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Quick Role & Currency Controls */}
           <div className="flex items-center gap-2 shrink-0">
+            {/* Cloud Firestore Status Badge */}
+            <div 
+              className={`hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[11px] font-semibold border ${
+                isCloudConnected 
+                  ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-400' 
+                  : 'bg-amber-950/40 border-amber-500/30 text-amber-300'
+              }`}
+              title={isCloudConnected ? "Live Cloud Firestore Active: Car listings are permanently saved to Google Cloud." : "Offline Mode: Changes saved locally."}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${isCloudConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+              <span>{isCloudConnected ? 'Cloud Synced' : 'Offline'}</span>
+            </div>
+
             {/* Currency switch */}
             <button
               id="currency-toggle-btn"

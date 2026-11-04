@@ -1,0 +1,130 @@
+{
+  "entities": {
+    "Vehicle": {
+      "title": "Vehicle Listing",
+      "description": "A vehicle listed for sale, rent, or lease in Rwanda",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "make": { "type": "string" },
+        "model": { "type": "string" },
+        "year": { "type": "number" },
+        "priceRwf": { "type": "number" },
+        "priceUsd": { "type": "number" },
+        "purpose": { "type": "string", "enum": ["buy", "rent", "lease"] },
+        "status": { "type": "string", "enum": ["available", "sold", "rented", "leased"] },
+        "mileageKm": { "type": "number" },
+        "transmission": { "type": "string", "enum": ["Automatic", "Manual"] },
+        "fuelType": { "type": "string", "enum": ["Petrol", "Diesel", "Hybrid", "Electric"] },
+        "bodyType": { "type": "string" },
+        "color": { "type": "string" },
+        "location": { "type": "string" },
+        "condition": { "type": "string" },
+        "description": { "type": "string" },
+        "images": { "type": "array" },
+        "features": { "type": "array" },
+        "seller": { "type": "object" },
+        "postedDate": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["make", "model", "year", "priceRwf", "purpose"]
+    },
+    "UserAccount": {
+      "title": "User Account",
+      "description": "User or dealership account registered on RwandaCarHub",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "status": { "type": "string", "enum": ["approved", "pending", "rejected"] },
+        "accountType": { "type": "string" },
+        "companyName": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "approvalNotes": { "type": "string" },
+        "isUnlimitedPosts": { "type": "boolean" }
+      },
+      "required": ["name", "email", "phone", "role", "status"]
+    },
+    "Booking": {
+      "title": "Test Drive or Inspection Booking",
+      "description": "A scheduled booking for a vehicle in Rwanda",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "vehicleId": { "type": "string" },
+        "vehicleName": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "type": { "type": "string" },
+        "status": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["customerName", "customerPhone", "date", "time"]
+    },
+    "ContactMessage": {
+      "title": "Contact or Inquiry Message",
+      "description": "An inquiry sent by a buyer to a seller",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "vehicleId": { "type": "string" },
+        "vehicleName": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderPhone": { "type": "string" },
+        "senderEmail": { "type": "string" },
+        "message": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["senderName", "senderPhone", "message"]
+    },
+    "PartnerAd": {
+      "title": "Partner Advertisement",
+      "description": "Promotional campaign or partner ad on the platform",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "shortName": { "type": "string" },
+        "category": { "type": "string" },
+        "tagline": { "type": "string" },
+        "headline": { "type": "string" },
+        "offerHighlight": { "type": "string" },
+        "description": { "type": "string" },
+        "websiteUrl": { "type": "string" },
+        "phone": { "type": "string" },
+        "status": { "type": "string" },
+        "displayWeight": { "type": "number" }
+      },
+      "required": ["name", "headline", "category", "status"]
+    }
+  },
+  "firestore": {
+    "/vehicles/{vehicleId}": {
+      "schema": { "$ref": "Vehicle" },
+      "description": "Collection of all vehicle listings posted on the marketplace"
+    },
+    "/accounts/{accountId}": {
+      "schema": { "$ref": "UserAccount" },
+      "description": "Registered individual and dealership accounts"
+    },
+    "/bookings/{bookingId}": {
+      "schema": { "$ref": "Booking" },
+      "description": "Customer test drive, inspection and rental bookings"
+    },
+    "/messages/{messageId}": {
+      "schema": { "$ref": "ContactMessage" },
+      "description": "Direct inquiries and buyer-seller messages"
+    },
+    "/partnerAds/{adId}": {
+      "schema": { "$ref": "PartnerAd" },
+      "description": "Partner ads displayed in tickers, banners and search spaces"
+    }
+  }
+}

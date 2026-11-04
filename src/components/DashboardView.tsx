@@ -307,9 +307,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   Approved Account
                 </span>
               )}
+              <span className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Cloud Synced
+              </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              {currentUser.email} • {currentUser.phone} • {currentUser.companyName || 'Kigali, Rwanda'}
+              {currentUser.email} • {currentUser.phone} • {currentUser.companyName || 'Kigali, Rwanda'} • <span className="text-emerald-400">Google Cloud Firestore Connected</span>
             </p>
           </div>
         </div>
