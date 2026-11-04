@@ -55,6 +55,12 @@ service cloud.firestore {
       allow create, update, delete: if isValidId(adId);
     }
 
+    // Admin Activity & Audit Logs Collection
+    match /activityLogs/{logId} {
+      allow read: if true;
+      allow create, update, delete: if isValidId(logId);
+    }
+
     // Default safety fallback: deny anything else
     match /{document=**} {
       allow read, write: if false;

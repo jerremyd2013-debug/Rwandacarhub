@@ -19,7 +19,7 @@ import {
   User 
 } from 'firebase/auth';
 import firebaseConfig from '../firebase-applet-config.json';
-import { Vehicle, Booking, ContactMessage, UserAccount, PartnerAd } from './types';
+import { Vehicle, Booking, ContactMessage, UserAccount, PartnerAd, ActivityLog } from './types';
 import { INITIAL_CARS } from './data/cars';
 
 // Initialize Firebase App
@@ -96,24 +96,29 @@ export async function testFirestoreConnection(): Promise<boolean> {
   }
 }
 
-// Seed initial vehicles if collection is empty
+// Seed or sync initial vehicles so the complete verified showroom inventory is always present
 export async function seedInitialVehiclesIfEmpty(): Promise<void> {
   const path = 'vehicles';
   try {
     const snapshot = await getDocs(collection(db, path));
-    if (snapshot.empty) {
-      console.log('Seeding initial marketplace vehicles to Cloud Firestore...');
-      for (const car of INITIAL_CARS) {
+    const existingIds = new Set<string>();
+    snapshot.forEach((docSnap) => existingIds.add(docSnap.id));
+
+    // Identify any showroom cars missing from Firestore
+    const missingCars = INITIAL_CARS.filter((car) => !existingIds.has(car.id));
+    if (missingCars.length > 0) {
+      console.log(`Syncing ${missingCars.length} missing verified showroom cars to Cloud Firestore...`);
+      for (const car of missingCars) {
         await setDoc(doc(db, path, car.id), car);
       }
-      console.log('Seeding completed successfully.');
+      console.log('Showroom vehicles sync complete.');
     }
   } catch (error) {
-    console.warn('Could not seed initial vehicles to Firestore:', error);
+    console.warn('Could not sync initial vehicles to Firestore:', error);
   }
 }
 
-// Real-time Vehicle Sync
+// Real-time Vehicle Sync with Core Catalog Guarantee
 export function subscribeToVehicles(
   onUpdate: (vehicles: Vehicle[]) => void,
   onError?: (err: Error) => void
@@ -122,28 +127,56 @@ export function subscribeToVehicles(
   return onSnapshot(
     collection(db, path),
     (snapshot) => {
-      if (snapshot.empty) {
-        // If collection in cloud is empty, seed it
-        seedInitialVehiclesIfEmpty();
+      try {
+        const cloudMap = new Map<string, Vehicle>();
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data() as Vehicle;
+          if (data && data.make && data.model) {
+            cloudMap.set(docSnap.id, { ...data, id: docSnap.id });
+          }
+        });
+
+        // Trigger background sync if any showroom cars are missing in cloud
+        if (cloudMap.size < INITIAL_CARS.length) {
+          seedInitialVehiclesIfEmpty().catch(console.warn);
+        }
+
+        // Start with complete INITIAL_CARS catalog to guarantee cars NEVER disappear
+        const mergedMap = new Map<string, Vehicle>();
+        for (const car of INITIAL_CARS) {
+          mergedMap.set(car.id, car);
+        }
+
+        // Overlay cloud documents (status updates, edits, new user-posted cars)
+        for (const [id, car] of cloudMap.entries()) {
+          mergedMap.set(id, car);
+        }
+
+        const items = Array.from(mergedMap.values());
+
+        // Sort with user-posted cars and newest first
+        items.sort((a, b) => {
+          const isUserCarA = a.id.startsWith('user-car-') || a.id.startsWith('veh-user');
+          const isUserCarB = b.id.startsWith('user-car-') || b.id.startsWith('veh-user');
+          if (isUserCarA && !isUserCarB) return -1;
+          if (!isUserCarA && isUserCarB) return 1;
+
+          const timeA = new Date(a.postedDate).getTime() || 0;
+          const timeB = new Date(b.postedDate).getTime() || 0;
+          return timeB - timeA;
+        });
+
+        onUpdate(items);
+      } catch (err) {
+        console.error('Error processing vehicle snapshot, using fallback catalog:', err);
         onUpdate(INITIAL_CARS);
-        return;
       }
-      const items: Vehicle[] = [];
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data() as Vehicle;
-        items.push({ ...data, id: docSnap.id });
-      });
-      // Sort with newest first
-      items.sort((a, b) => {
-        const timeA = new Date(a.postedDate).getTime() || 0;
-        const timeB = new Date(b.postedDate).getTime() || 0;
-        return timeB - timeA;
-      });
-      onUpdate(items);
     },
     (error) => {
       console.error('Vehicle subscription error:', error);
       onError?.(error);
+      // Guarantee fallback inventory is always displayed
+      onUpdate(INITIAL_CARS);
     }
   );
 }
@@ -300,3 +333,39 @@ export async function saveAccountToCloud(account: UserAccount): Promise<void> {
     handleFirestoreError(error, OperationType.WRITE, `${path}/${account.id}`);
   }
 }
+
+// Activity Logs Cloud Operations
+export function subscribeToActivityLogs(onUpdate: (logs: ActivityLog[]) => void): () => void {
+  const path = 'activityLogs';
+  return onSnapshot(
+    collection(db, path),
+    (snapshot) => {
+      const items: ActivityLog[] = [];
+      snapshot.forEach((docSnap) => {
+        items.push({ ...(docSnap.data() as ActivityLog), id: docSnap.id });
+      });
+      // Sort newest first
+      items.sort((a, b) => {
+        const timeA = new Date(a.createdAt || a.timestamp).getTime() || 0;
+        const timeB = new Date(b.createdAt || b.timestamp).getTime() || 0;
+        return timeB - timeA;
+      });
+      if (items.length > 0) {
+        onUpdate(items);
+      }
+    },
+    (error) => {
+      console.error('Activity logs subscription error:', error);
+    }
+  );
+}
+
+export async function saveActivityLogToCloud(log: ActivityLog): Promise<void> {
+  const path = 'activityLogs';
+  try {
+    await setDoc(doc(db, path, log.id), log);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, `${path}/${log.id}`);
+  }
+}
+

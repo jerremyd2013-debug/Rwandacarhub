@@ -15,10 +15,11 @@ import {
   Filter,
   Check
 } from 'lucide-react';
-import { Vehicle, FilterState, ContactMessage, Booking, VehiclePurpose, UserAccount, VehicleStatus, PartnerAd } from './types';
+import { Vehicle, FilterState, ContactMessage, Booking, VehiclePurpose, UserAccount, VehicleStatus, PartnerAd, ActivityLog, ActivityType } from './types';
 import { INITIAL_CARS, LISTING_PRICING_PLANS } from './data/cars';
 import { INITIAL_ACCOUNTS } from './data/mockUsers';
 import { PARTNER_ADS } from './data/partners';
+import { INITIAL_ACTIVITY_LOGS } from './data/mockActivityLogs';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { CarCard } from './components/CarCard';
@@ -50,7 +51,9 @@ import {
   subscribeToAccounts,
   saveAccountToCloud,
   testFirestoreConnection,
-  seedInitialVehiclesIfEmpty 
+  seedInitialVehiclesIfEmpty,
+  subscribeToActivityLogs,
+  saveActivityLogToCloud
 } from './firebase';
 
 const HERO_VEHICLE_IMAGES = [
@@ -82,7 +85,8 @@ const STORAGE_KEYS = {
   BOOKINGS: 'rwandacarhub_bookings_v2',
   MESSAGES: 'rwandacarhub_messages_v2',
   FAVORITES: 'rwandacarhub_favorites_v2',
-  ADS: 'rwandacarhub_ads_v2'
+  ADS: 'rwandacarhub_ads_v2',
+  ACTIVITY_LOGS: 'rwandacarhub_activity_logs_v2'
 };
 
 export default function App() {
@@ -91,14 +95,20 @@ export default function App() {
   const [currency, setCurrency] = useState<'RWF' | 'USD'>('RWF');
   const [heroVehicleImage, setHeroVehicleImage] = useState(HERO_VEHICLE_IMAGES[0].url);
 
-  // Vehicles dataset state (persisted to localStorage so posted cars never disappear)
+  // Vehicles dataset state (persisted with core showroom catalog guarantee so cars never disappear)
   const [vehicles, setVehicles] = useState<Vehicle[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.VEHICLES);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          // Merge with core INITIAL_CARS so verified showroom vehicles are never dropped
+          const map = new Map<string, Vehicle>();
+          INITIAL_CARS.forEach((c) => map.set(c.id, c));
+          parsed.forEach((c: Vehicle) => {
+            if (c && c.id && c.make) map.set(c.id, c);
+          });
+          return Array.from(map.values());
         }
       }
     } catch (e) {
@@ -197,6 +207,54 @@ export default function App() {
     } catch (e) {}
   }, [currentUser]);
 
+  // Marketplace Activity & Audit Logs State (Admin Activity Tracker)
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.ACTIVITY_LOGS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return INITIAL_ACTIVITY_LOGS;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.ACTIVITY_LOGS, JSON.stringify(activityLogs));
+    } catch (e) {}
+  }, [activityLogs]);
+
+  // Helper to record an activity event both locally and in Google Cloud Firestore
+  const logActivity = (
+    type: ActivityType,
+    category: 'vehicles' | 'adverts' | 'accounts' | 'system',
+    title: string,
+    description: string,
+    metadata?: Record<string, any>
+  ) => {
+    const actorName = currentUser ? currentUser.name : 'System Administrator';
+    const actorEmail = currentUser?.email || 'admin@rwandacarhub.com';
+    const actorRole = currentUser?.role === 'admin' ? 'Administrator' : currentUser ? 'User' : 'System';
+    const newLog: ActivityLog = {
+      id: `act-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      type,
+      category,
+      title,
+      description,
+      timestamp: 'Just now',
+      createdAt: new Date().toISOString(),
+      actor: {
+        name: actorName,
+        email: actorEmail,
+        role: actorRole
+      },
+      metadata
+    };
+    setActivityLogs((prev) => [newLog, ...prev]);
+    saveActivityLogToCloud(newLog).catch(console.error);
+  };
+
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleSelectUser = (acc: UserAccount | null) => {
@@ -236,6 +294,13 @@ export default function App() {
     };
     setAccounts((prev) => [newAcc, ...prev]);
     saveAccountToCloud(newAcc).catch(console.error);
+    logActivity(
+      'account_registered',
+      'accounts',
+      `Account Registered: ${newAcc.name}`,
+      `New ${newAcc.accountType} account registered (${newAcc.email}). Awaiting administrator approval.`,
+      { userId: newAcc.id, userName: newAcc.name, email: newAcc.email, accountType: newAcc.accountType }
+    );
     setCurrentUser(newAcc);
     showToast(`Account registered for ${newAcc.name}! Status: Pending Approval. Website admin must approve before dashboard is visible.`);
   };
@@ -253,6 +318,13 @@ export default function App() {
     );
     if (approvedAcc) {
       saveAccountToCloud(approvedAcc).catch(console.error);
+      logActivity(
+        'account_approval',
+        'accounts',
+        `Account Approved: ${(approvedAcc as UserAccount).name}`,
+        `Account status changed to "approved". User can now access member dashboard and post listings.`,
+        { userId, userName: (approvedAcc as UserAccount).name, status: 'approved' }
+      );
     }
     setCurrentUser((prev) => (prev && prev.id === userId ? { ...prev, status: 'approved' } : prev));
     showToast('Account successfully approved! Dashboard access is now enabled.');
@@ -271,6 +343,13 @@ export default function App() {
     );
     if (rejectedAcc) {
       saveAccountToCloud(rejectedAcc).catch(console.error);
+      logActivity(
+        'account_approval',
+        'accounts',
+        `Account Declined: ${(rejectedAcc as UserAccount).name}`,
+        `Account registration was declined by the administrator.`,
+        { userId, userName: (rejectedAcc as UserAccount).name, status: 'rejected' }
+      );
     }
     setCurrentUser((prev) => (prev && prev.id === userId ? { ...prev, status: 'rejected' } : prev));
     showToast('Account registration declined.');
@@ -295,54 +374,96 @@ export default function App() {
   }, [partnerAds]);
 
   const handleApproveAd = (adId: string) => {
+    let approvedAd: PartnerAd | null = null;
     setPartnerAds((prev) =>
       prev.map((ad) => {
         if (ad.id === adId) {
           const updated = { ...ad, status: 'approved' as const };
+          approvedAd = updated;
           savePartnerAdToCloud(updated).catch(console.error);
           return updated;
         }
         return ad;
       })
     );
+    if (approvedAd) {
+      logActivity(
+        'ad_status',
+        'adverts',
+        `Partner Ad Approved: ${(approvedAd as PartnerAd).name}`,
+        `Advertisement approved and featured in partner slider & public banner.`,
+        { adId, adName: (approvedAd as PartnerAd).name, status: 'approved' }
+      );
+    }
     showToast('Advert approved! It is now actively featured in the partner slider & ticker.');
   };
 
   const handleRejectAd = (adId: string) => {
+    let rejectedAd: PartnerAd | null = null;
     setPartnerAds((prev) =>
       prev.map((ad) => {
         if (ad.id === adId) {
           const updated = { ...ad, status: 'rejected' as const };
+          rejectedAd = updated;
           savePartnerAdToCloud(updated).catch(console.error);
           return updated;
         }
         return ad;
       })
     );
+    if (rejectedAd) {
+      logActivity(
+        'ad_status',
+        'adverts',
+        `Partner Ad Rejected: ${(rejectedAd as PartnerAd).name}`,
+        `Advertisement rejected and hidden from public display.`,
+        { adId, adName: (rejectedAd as PartnerAd).name, status: 'rejected' }
+      );
+    }
     showToast('Advert rejected and hidden from public view.');
   };
 
   const handleDiminishAd = (adId: string) => {
+    let diminishedAd: PartnerAd | null = null;
     setPartnerAds((prev) =>
       prev.map((ad) => {
         if (ad.id === adId) {
           const updated = { ...ad, status: 'diminished' as const, displayWeight: 1 };
+          diminishedAd = updated;
           savePartnerAdToCloud(updated).catch(console.error);
           return updated;
         }
         return ad;
       })
     );
+    if (diminishedAd) {
+      logActivity(
+        'ad_status',
+        'adverts',
+        `Partner Ad Diminished: ${(diminishedAd as PartnerAd).name}`,
+        `Display frequency lowered to 1x (rare appearance in partner carousel).`,
+        { adId, adName: (diminishedAd as PartnerAd).name, status: 'diminished', weight: 1 }
+      );
+    }
     showToast('Advert diminished. Display frequency lowered to 1x (rare appearance).');
   };
 
   const handleRemoveAd = (adId: string) => {
+    const adToRemove = partnerAds.find((ad) => ad.id === adId);
     setPartnerAds((prev) => prev.filter((ad) => ad.id !== adId));
     deletePartnerAdFromCloud(adId).catch(console.error);
+    logActivity(
+      'ad_removed',
+      'adverts',
+      `Partner Ad Deleted: ${adToRemove?.name || adId}`,
+      `Advertisement was permanently deleted from RwandaCarHub.`,
+      { adId, adName: adToRemove?.name }
+    );
     showToast('Advert removed completely from RwandaCarHub.');
   };
 
   const handleUpdateAdWeight = (adId: string, weight: number) => {
+    let updatedAdObj: PartnerAd | null = null;
     setPartnerAds((prev) =>
       prev.map((ad) => {
         if (ad.id === adId) {
@@ -351,18 +472,29 @@ export default function App() {
             displayWeight: weight,
             status: ad.status === 'diminished' && weight > 1 ? ('approved' as const) : ad.status
           };
+          updatedAdObj = updated;
           savePartnerAdToCloud(updated).catch(console.error);
           return updated;
         }
         return ad;
       })
     );
+    if (updatedAdObj) {
+      logActivity(
+        'ad_status',
+        'adverts',
+        `Ad Weight Updated: ${(updatedAdObj as PartnerAd).name} (${weight}x)`,
+        `Display frequency set to ${weight}x.`,
+        { adId, adName: (updatedAdObj as PartnerAd).name, weight }
+      );
+    }
     const label = weight === 5 ? '5x (VIP Top Frequency)' : weight === 3 ? '3x (High)' : weight === 2 ? '2x (Normal)' : '1x (Rare)';
     showToast(`Advert frequency set to ${label}.`);
   };
 
   const handleUpdateAdExpiry = (adId: string, expiryDate: string) => {
     const today = new Date().toISOString().split('T')[0];
+    let updatedAdObj: PartnerAd | null = null;
     setPartnerAds((prev) =>
       prev.map((ad) => {
         if (ad.id === adId) {
@@ -372,12 +504,22 @@ export default function App() {
             expiryDate,
             status: isExpired ? ('expired' as const) : ad.status === 'expired' ? ('approved' as const) : ad.status
           };
+          updatedAdObj = updated;
           savePartnerAdToCloud(updated).catch(console.error);
           return updated;
         }
         return ad;
       })
     );
+    if (updatedAdObj) {
+      logActivity(
+        'ad_status',
+        'adverts',
+        `Ad Expiry Updated: ${(updatedAdObj as PartnerAd).name}`,
+        `Expiration date updated to ${expiryDate}.`,
+        { adId, adName: (updatedAdObj as PartnerAd).name, expiryDate }
+      );
+    }
     showToast(`Expiry date updated to ${expiryDate}.`);
   };
 
@@ -390,6 +532,13 @@ export default function App() {
       return [savedAd, ...prev];
     });
     savePartnerAdToCloud(savedAd).catch(console.error);
+    logActivity(
+      'ad_status',
+      'adverts',
+      `Partner Ad Saved: ${savedAd.name}`,
+      `Banner campaign "${savedAd.headline}" saved by admin.`,
+      { adId: savedAd.id, adName: savedAd.name }
+    );
     showToast(`Advert for "${savedAd.name}" saved successfully!`);
   };
 
@@ -430,6 +579,13 @@ export default function App() {
     };
     setPartnerAds((prev) => [pendingAd, ...prev]);
     savePartnerAdToCloud(pendingAd).catch(console.error);
+    logActivity(
+      'ad_added',
+      'adverts',
+      `New Ad Inquiry: ${inquiry.companyName}`,
+      `New advertising campaign inquiry received for "${inquiry.adType}". Status: pending approval.`,
+      { adId: pendingAd.id, companyName: inquiry.companyName, adType: inquiry.adType, phone: inquiry.phone }
+    );
     showToast(`Advertising inquiry received from ${inquiry.companyName}! Added to Admin Adverts for review.`);
   };
   const [messages, setMessages] = useState<ContactMessage[]>(() => {
@@ -520,11 +676,27 @@ export default function App() {
   const [isCloudConnected, setIsCloudConnected] = useState<boolean>(true);
 
   useEffect(() => {
-    // Test connectivity to Cloud Firestore
+    // Test connectivity to Cloud Firestore & guarantee inventory
     testFirestoreConnection().then((connected) => {
       setIsCloudConnected(connected);
       if (connected) {
         seedInitialVehiclesIfEmpty();
+        // Rescue and permanently save any user cars from localStorage to Firestore
+        try {
+          const savedListings = localStorage.getItem(STORAGE_KEYS.USER_LISTINGS);
+          if (savedListings) {
+            const parsed = JSON.parse(savedListings);
+            if (Array.isArray(parsed)) {
+              for (const car of parsed) {
+                if (car && car.id && (car.id.startsWith('user-car-') || car.id.startsWith('veh-user'))) {
+                  saveVehicleToCloud(car).catch(console.warn);
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Local vehicle migration error:', e);
+        }
       }
     });
 
@@ -570,12 +742,20 @@ export default function App() {
       }
     });
 
+    // Subscribe to real-time activity and audit logs
+    const unsubscribeActivityLogs = subscribeToActivityLogs((cloudLogs) => {
+      if (cloudLogs && cloudLogs.length > 0) {
+        setActivityLogs(cloudLogs);
+      }
+    });
+
     return () => {
       unsubscribeVehicles();
       unsubscribeBookings();
       unsubscribeMessages();
       unsubscribeAds();
       unsubscribeAccounts();
+      unsubscribeActivityLogs();
     };
   }, []);
 
@@ -627,18 +807,52 @@ export default function App() {
         console.error('Failed to sync car to cloud database:', err);
         showToast('Car saved locally. Will sync to Cloud Firestore when reconnected.');
       });
+
+    // 3. Log activity event to Admin Activity Tracker
+    const carName = `${newCar.year} ${newCar.make} ${newCar.model}`;
+    logActivity(
+      'vehicle_added',
+      'vehicles',
+      `New Listing Added: ${carName}`,
+      `Vehicle "${carName}" posted for ${newCar.purpose === 'rent' ? `${newCar.priceRwf.toLocaleString()} Frw/day` : `${newCar.priceRwf.toLocaleString()} Frw`} in ${newCar.location}.`,
+      {
+        vehicleId: newCar.id,
+        vehicleTitle: carName,
+        price: newCar.priceRwf,
+        purpose: newCar.purpose,
+        seller: newCar.seller.name
+      }
+    );
   };
 
   // Delete listing handler - Deleted from Google Cloud Firestore
   const handleDeleteListing = (id: string) => {
+    const targetCar = vehicles.find((c) => c.id === id);
+    const carName = targetCar ? `${targetCar.year} ${targetCar.make} ${targetCar.model}` : id;
     setVehicles((prev) => prev.filter((c) => c.id !== id));
     setUserListings((prev) => prev.filter((c) => c.id !== id));
     deleteVehicleFromCloud(id).catch(console.error);
+
+    // Log deletion event
+    logActivity(
+      'vehicle_deleted',
+      'vehicles',
+      `Listing Removed: ${carName}`,
+      `Vehicle listing was permanently deleted from the marketplace inventory.`,
+      {
+        vehicleId: id,
+        vehicleTitle: carName
+      }
+    );
     showToast('Vehicle removed from cloud database.');
   };
 
   // Update vehicle status handler (available, sold, rented, leased) - Synced to Firestore
   const handleUpdateVehicleStatus = (vehicleId: string, newStatus: VehicleStatus) => {
+    const targetCar = vehicles.find((v) => v.id === vehicleId);
+    const carName = targetCar ? `${targetCar.year} ${targetCar.make} ${targetCar.model}` : vehicleId;
+    const previousStatus = targetCar?.status || 'available';
+
     setVehicles((prev) =>
       prev.map((v) => (v.id === vehicleId ? { ...v, status: newStatus } : v))
     );
@@ -650,6 +864,20 @@ export default function App() {
     );
 
     updateVehicleStatusInCloud(vehicleId, newStatus).catch(console.error);
+
+    // Log status change event
+    logActivity(
+      'vehicle_status',
+      'vehicles',
+      `Vehicle Status Changed to ${newStatus.toUpperCase()}`,
+      `Listing "${carName}" status updated from ${previousStatus} to ${newStatus}.`,
+      {
+        vehicleId,
+        vehicleTitle: carName,
+        previousStatus,
+        newStatus
+      }
+    );
 
     const statusLabels: Record<VehicleStatus, string> = {
       available: 'marked as Available in stock',
@@ -708,6 +936,28 @@ export default function App() {
     return vehicles.filter((c) => compareIds.includes(c.id));
   }, [vehicles, compareIds]);
 
+  // Combine locally tracked user listings with any cloud cars created by user
+  const effectiveUserListings = useMemo(() => {
+    const listMap = new Map<string, Vehicle>();
+    for (const car of userListings) {
+      if (car && car.id) listMap.set(car.id, car);
+    }
+    for (const car of vehicles) {
+      if (!car || !car.id) continue;
+      const isUserCar = car.id.startsWith('user-car-') || car.id.startsWith('veh-user');
+      const matchesEmail = Boolean(
+        currentUser?.email && car.seller?.email && car.seller.email.toLowerCase() === currentUser.email.toLowerCase()
+      );
+      const matchesPhone = Boolean(
+        currentUser?.phone && car.seller?.phone && car.seller.phone === currentUser.phone
+      );
+      if (isUserCar || matchesEmail || matchesPhone) {
+        listMap.set(car.id, car);
+      }
+    }
+    return Array.from(listMap.values());
+  }, [userListings, vehicles, currentUser]);
+
   // Tab change with purpose synchronization
   const handleTabSelect = (tab: string, purpose?: VehiclePurpose) => {
     setCurrentTab(tab);
@@ -739,35 +989,37 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Filtered vehicles calculation
+  // Filtered vehicles calculation with defensive null-safety
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((car) => {
+      if (!car) return false;
+
       // Purpose filter
-      if (filters.purpose !== 'all' && car.purpose !== filters.purpose) {
+      if (filters.purpose && filters.purpose !== 'all' && car.purpose !== filters.purpose) {
         return false;
       }
       // Make filter
-      if (filters.make && car.make.toLowerCase() !== filters.make.toLowerCase()) {
+      if (filters.make && car.make && car.make.toLowerCase() !== filters.make.toLowerCase()) {
         return false;
       }
       // Body type filter
-      if (filters.bodyType && car.bodyType.toLowerCase() !== filters.bodyType.toLowerCase()) {
+      if (filters.bodyType && car.bodyType && car.bodyType.toLowerCase() !== filters.bodyType.toLowerCase()) {
         return false;
       }
       // Fuel type filter
-      if (filters.fuelType && car.fuelType.toLowerCase() !== filters.fuelType.toLowerCase()) {
+      if (filters.fuelType && car.fuelType && car.fuelType.toLowerCase() !== filters.fuelType.toLowerCase()) {
         return false;
       }
       // Transmission filter
-      if (filters.transmission && car.transmission.toLowerCase() !== filters.transmission.toLowerCase()) {
+      if (filters.transmission && car.transmission && car.transmission.toLowerCase() !== filters.transmission.toLowerCase()) {
         return false;
       }
       // Condition filter
-      if (filters.condition && car.condition.toLowerCase() !== filters.condition.toLowerCase()) {
+      if (filters.condition && car.condition && car.condition.toLowerCase() !== filters.condition.toLowerCase()) {
         return false;
       }
       // Location filter
-      if (filters.location && !car.location.toLowerCase().includes(filters.location.toLowerCase())) {
+      if (filters.location && car.location && !car.location.toLowerCase().includes(filters.location.toLowerCase())) {
         return false;
       }
       // Status filter
@@ -779,22 +1031,31 @@ export default function App() {
       }
       // Search query filter (search make, model, location, seller, features)
       if (filters.searchQuery) {
-        const query = filters.searchQuery.toLowerCase();
-        const matchesMake = car.make.toLowerCase().includes(query);
-        const matchesModel = car.model.toLowerCase().includes(query);
-        const matchesLoc = car.location.toLowerCase().includes(query);
-        const matchesSeller = car.seller.name.toLowerCase().includes(query) || (car.seller.dealerName || '').toLowerCase().includes(query);
-        const matchesFeature = car.features.some(f => f.toLowerCase().includes(query));
+        const query = filters.searchQuery.toLowerCase().trim();
+        const matchesMake = (car.make || '').toLowerCase().includes(query);
+        const matchesModel = (car.model || '').toLowerCase().includes(query);
+        const matchesLoc = (car.location || '').toLowerCase().includes(query);
+        const sellerName = car.seller?.name || '';
+        const dealerName = car.seller?.dealerName || '';
+        const matchesSeller = (sellerName + ' ' + dealerName).toLowerCase().includes(query);
+        const matchesFeature = Array.isArray(car.features) && car.features.some((f) => (f || '').toLowerCase().includes(query));
         if (!matchesMake && !matchesModel && !matchesLoc && !matchesSeller && !matchesFeature) {
           return false;
         }
       }
       return true;
     }).sort((a, b) => {
-      if (filters.sortBy === 'price-asc') return a.priceRwf - b.priceRwf;
-      if (filters.sortBy === 'price-desc') return b.priceRwf - a.priceRwf;
-      if (filters.sortBy === 'year-desc') return b.year - a.year;
-      if (filters.sortBy === 'mileage-asc') return a.mileageKm - b.mileageKm;
+      const priceA = a.priceRwf || 0;
+      const priceB = b.priceRwf || 0;
+      const yearA = a.year || 0;
+      const yearB = b.year || 0;
+      const mileageA = a.mileageKm || 0;
+      const mileageB = b.mileageKm || 0;
+
+      if (filters.sortBy === 'price-asc') return priceA - priceB;
+      if (filters.sortBy === 'price-desc') return priceB - priceA;
+      if (filters.sortBy === 'year-desc') return yearB - yearA;
+      if (filters.sortBy === 'mileage-asc') return mileageA - mileageB;
       // Default: featured first
       return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
     });
@@ -1312,7 +1573,7 @@ export default function App() {
         {currentTab === 'dashboard' && (
           <DashboardView
             favoriteVehicles={favoriteVehicles}
-            userListings={userListings}
+            userListings={effectiveUserListings}
             messages={messages}
             bookings={bookings}
             currency={currency}
@@ -1320,6 +1581,7 @@ export default function App() {
             accounts={accounts}
             allVehicles={vehicles}
             partnerAds={partnerAds}
+            activityLogs={activityLogs}
             onApproveAd={handleApproveAd}
             onRejectAd={handleRejectAd}
             onDiminishAd={handleDiminishAd}

@@ -27,9 +27,10 @@ import {
   CheckCircle2,
   Megaphone
 } from 'lucide-react';
-import { Vehicle, ContactMessage, Booking, UserAccount, VehicleStatus, PartnerAd } from '../types';
+import { Vehicle, ContactMessage, Booking, UserAccount, VehicleStatus, PartnerAd, ActivityLog } from '../types';
 import { formatPrice } from '../utils/formatters';
 import { AdminAdvertsManager } from './AdminAdvertsManager';
+import { AdminActivityLog } from './AdminActivityLog';
 
 interface DashboardViewProps {
   favoriteVehicles: Vehicle[];
@@ -41,6 +42,7 @@ interface DashboardViewProps {
   accounts: UserAccount[];
   allVehicles?: Vehicle[];
   partnerAds?: PartnerAd[];
+  activityLogs?: ActivityLog[];
   onApproveAd?: (adId: string) => void;
   onRejectAd?: (adId: string) => void;
   onDiminishAd?: (adId: string) => void;
@@ -70,6 +72,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   accounts,
   allVehicles = [],
   partnerAds = [],
+  activityLogs = [],
   onApproveAd,
   onRejectAd,
   onDiminishAd,
@@ -91,13 +94,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const isAdmin = currentUser?.role === 'admin';
   const isApproved = currentUser?.status === 'approved';
 
-  // Default to 'inventory' or 'adverts' or 'approvals' tab for admin, else 'listings'
-  const [activeTab, setActiveTab] = useState<'listings' | 'inventory' | 'adverts' | 'favorites' | 'messages' | 'searches' | 'bookings' | 'profile' | 'notifications' | 'approvals'>(
+  // Default to 'inventory' or 'adverts' or 'approvals' or 'activity' tab for admin, else 'listings'
+  const [activeTab, setActiveTab] = useState<'listings' | 'inventory' | 'adverts' | 'approvals' | 'activity' | 'favorites' | 'messages' | 'searches' | 'bookings' | 'profile' | 'notifications'>(
     isAdmin ? 'inventory' : 'listings'
   );
 
   React.useEffect(() => {
-    if (isAdmin && (activeTab === 'listings' || !['approvals', 'inventory', 'adverts'].includes(activeTab))) {
+    if (isAdmin && (activeTab === 'listings' || !['approvals', 'inventory', 'adverts', 'activity'].includes(activeTab))) {
       setActiveTab('inventory');
     }
   }, [isAdmin]);
@@ -391,6 +394,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {partnerAds.filter(a => a.status === 'pending').length} New
               </span>
             )}
+          </button>
+        )}
+
+        {/* ADMIN SPECIAL TAB: ACTIVITY & AUDIT LOG */}
+        {isAdmin && (
+          <button
+            id="tab-admin-activity"
+            onClick={() => setActiveTab('activity')}
+            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'activity'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-[#0f172a] text-slate-300 hover:text-white border border-slate-800'
+            }`}
+          >
+            <Clock className="w-4 h-4 text-blue-400" />
+            <span>Activity Log ({activityLogs.length})</span>
           </button>
         )}
 
@@ -981,6 +1000,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           onUpdateWeight={onUpdateAdWeight || (() => {})}
           onUpdateExpiry={onUpdateAdExpiry || (() => {})}
           onSaveAd={onSaveAd || (() => {})}
+        />
+      )}
+
+      {/* ==================== TAB CONTENT: ADMIN ACTIVITY & AUDIT LOG ==================== */}
+      {isAdmin && activeTab === 'activity' && (
+        <AdminActivityLog
+          logs={activityLogs}
+          onNavigateTab={(tab) => setActiveTab(tab)}
         />
       )}
 

@@ -92,7 +92,47 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const cameraInputRef = React.useRef<HTMLInputElement>(null);
 
-  // File Upload Processor using FileReader
+  // Helper function: Client-side photo compression for instant Cloud Firestore persistence
+  const compressImageFile = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1000;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(e.target?.result as string);
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          // High quality, lightweight JPEG data URI (typically 30-70KB)
+          const compressedDataUri = canvas.toDataURL('image/jpeg', 0.75);
+          resolve(compressedDataUri);
+        };
+        img.onerror = () => reject(new Error('Failed to load image for compression.'));
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error('Error reading image file.'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // File Upload Processor with Automatic Compression
   const handleProcessFiles = (files: FileList | File[] | null) => {
     if (!files || files.length === 0) return;
     setUploadError(null);
@@ -105,27 +145,9 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
       return;
     }
 
-    const readers = validFiles.map((file) => {
-      return new Promise<string>((resolve, reject) => {
-        if (file.size > 15 * 1024 * 1024) {
-          reject(new Error(`"${file.name}" is over 15MB. Please choose a smaller file.`));
-          return;
-        }
+    const compressionPromises = validFiles.map((file) => compressImageFile(file));
 
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === 'string') {
-            resolve(reader.result);
-          } else {
-            reject(new Error('Failed to read image data.'));
-          }
-        };
-        reader.onerror = () => reject(new Error('Error reading image file.'));
-        reader.readAsDataURL(file);
-      });
-    });
-
-    Promise.allSettled(readers).then((results) => {
+    Promise.allSettled(compressionPromises).then((results) => {
       const newImages: string[] = [];
       results.forEach((res) => {
         if (res.status === 'fulfilled' && res.value) {

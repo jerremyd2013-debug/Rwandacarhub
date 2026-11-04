@@ -103,6 +103,23 @@
         "displayWeight": { "type": "number" }
       },
       "required": ["name", "headline", "category", "status"]
+    },
+    "ActivityLog": {
+      "title": "Admin Activity & Audit Log",
+      "description": "Log entry tracking marketplace changes to vehicles, ads, and accounts",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "category": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "actor": { "type": "object" },
+        "metadata": { "type": "object" }
+      },
+      "required": ["title", "type", "category", "timestamp"]
     }
   },
   "firestore": {
@@ -125,6 +142,10 @@
     "/partnerAds/{adId}": {
       "schema": { "$ref": "PartnerAd" },
       "description": "Partner ads displayed in tickers, banners and search spaces"
+    },
+    "/activityLogs/{logId}": {
+      "schema": { "$ref": "ActivityLog" },
+      "description": "Marketplace activity audit log entries for administrator monitoring"
     }
   }
 }

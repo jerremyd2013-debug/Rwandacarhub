@@ -184,3 +184,36 @@ export interface PartnerAd {
   clicksCount?: number;
 }
 
+export type ActivityType = 
+  | 'vehicle_added' 
+  | 'vehicle_status' 
+  | 'vehicle_deleted' 
+  | 'ad_status' 
+  | 'ad_added' 
+  | 'ad_removed' 
+  | 'account_approval' 
+  | 'account_registered';
+
+export interface ActivityLog {
+  id: string;
+  type: ActivityType;
+  category: 'vehicles' | 'adverts' | 'accounts' | 'system';
+  title: string;
+  description: string;
+  timestamp: string;
+  createdAt: string; // ISO date or formatted time
+  actor: {
+    name: string;
+    role: string;
+    email?: string;
+  };
+  metadata?: {
+    entityId?: string;
+    entityName?: string;
+    previousState?: string;
+    newState?: string;
+    badge?: string;
+    tag?: string;
+    [key: string]: any;
+  };
+}
