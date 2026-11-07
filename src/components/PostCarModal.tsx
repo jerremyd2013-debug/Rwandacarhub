@@ -99,7 +99,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const maxDim = 1000;
+          const maxDim = 800;
           let width = img.width;
           let height = img.height;
           if (width > maxDim || height > maxDim) {
@@ -120,8 +120,8 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
             return;
           }
           ctx.drawImage(img, 0, 0, width, height);
-          // High quality, lightweight JPEG data URI (typically 30-70KB)
-          const compressedDataUri = canvas.toDataURL('image/jpeg', 0.75);
+          // High quality, ultra-lightweight JPEG data URI (typically 25-45KB)
+          const compressedDataUri = canvas.toDataURL('image/jpeg', 0.70);
           resolve(compressedDataUri);
         };
         img.onerror = () => reject(new Error('Failed to load image for compression.'));
@@ -243,9 +243,14 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
 
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!model || !sellerName) {
-      alert('Please fill out the vehicle model and your seller name.');
+    if (!model.trim()) {
+      setUploadError('Please enter the vehicle model name (e.g. Prado TX-L, RAV4, C200, Hilux).');
+      const el = document.getElementById('vehicle-model-input');
+      el?.focus();
       return;
+    }
+    if (!sellerName.trim()) {
+      setSellerName(currentUser?.name || 'Verified Kigali Seller');
     }
     if (uploadedImages.length === 0) {
       setUploadError('Please upload at least 1 real picture of the vehicle.');
@@ -253,6 +258,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
       el?.scrollIntoView({ behavior: 'smooth' });
       return;
     }
+    setUploadError(null);
     setStep('payment');
   };
 
@@ -262,9 +268,9 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
     setTimeout(() => {
       setPaymentProcessing(false);
 
-      const finalImages = uploadedImages.length > 0 
+      const finalImages = (uploadedImages.length > 0 
         ? uploadedImages 
-        : ['https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=1000&auto=format&fit=crop&q=80'];
+        : ['https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=1000&auto=format&fit=crop&q=80']).slice(0, 6);
 
       const createdVehicle: Vehicle = {
         id: `user-car-${Date.now()}`,
@@ -274,12 +280,13 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
         priceRwf: Number(priceRwf),
         priceUsd: calculatedUsd,
         purpose,
+        status: 'available',
         mileageKm: Number(mileageKm),
         transmission,
         fuelType,
         bodyType,
         color: 'Clean Finish',
-        location,
+        location: location || 'Kigali, Rwanda',
         condition,
         seller: {
           name: sellerName || currentUser?.name || 'Verified Kigali Seller',
@@ -289,7 +296,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
           isVerified: true,
           rating: 5.0,
           reviewCount: 1,
-          dealerName: currentUser?.companyName || sellerName
+          dealerName: currentUser?.companyName || sellerName || 'Verified Seller'
         },
         images: finalImages,
         features: [
@@ -673,6 +680,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">Model *</label>
                   <input
+                    id="vehicle-model-input"
                     type="text"
                     required
                     placeholder="e.g. RAV4 / Prado / Hilux"
@@ -801,6 +809,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">Seller / Dealer Name *</label>
                   <input
+                    id="seller-name-input"
                     type="text"
                     required
                     placeholder="Your Name or Dealership"
@@ -1150,6 +1159,23 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                   className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                 />
               </div>
+
+              {/* Validation/Upload Error Banner */}
+              {uploadError && (
+                <div className="p-3 bg-red-950/80 border border-red-700/80 rounded-xl text-xs text-red-200 flex items-center justify-between gap-2 animate-in fade-in">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                    <span>{uploadError}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setUploadError(null)}
+                    className="text-slate-400 hover:text-white"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
 
               <div className="flex justify-between pt-2">
                 <button

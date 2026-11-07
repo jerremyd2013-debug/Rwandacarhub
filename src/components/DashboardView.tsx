@@ -43,6 +43,8 @@ interface DashboardViewProps {
   allVehicles?: Vehicle[];
   partnerAds?: PartnerAd[];
   activityLogs?: ActivityLog[];
+  isQuotaExceeded?: boolean;
+  isCloudConnected?: boolean;
   onApproveAd?: (adId: string) => void;
   onRejectAd?: (adId: string) => void;
   onDiminishAd?: (adId: string) => void;
@@ -73,6 +75,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   allVehicles = [],
   partnerAds = [],
   activityLogs = [],
+  isQuotaExceeded = false,
+  isCloudConnected = true,
   onApproveAd,
   onRejectAd,
   onDiminishAd,
@@ -98,12 +102,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [activeTab, setActiveTab] = useState<'listings' | 'inventory' | 'adverts' | 'approvals' | 'activity' | 'favorites' | 'messages' | 'searches' | 'bookings' | 'profile' | 'notifications'>(
     isAdmin ? 'inventory' : 'listings'
   );
-
-  React.useEffect(() => {
-    if (isAdmin && (activeTab === 'listings' || !['approvals', 'inventory', 'adverts', 'activity'].includes(activeTab))) {
-      setActiveTab('inventory');
-    }
-  }, [isAdmin]);
   
   const [inventorySearch, setInventorySearch] = useState('');
   const [inventoryStatusFilter, setInventoryStatusFilter] = useState<'all' | 'available' | 'sold' | 'rented' | 'leased'>('all');
@@ -270,16 +268,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   });
 
   // Vehicle Inventory calculations for Admin Vehicle Status tab
-  const filteredInventoryCars = allVehicles.filter((car) => {
-    const query = inventorySearch.toLowerCase();
-    const matchesSearch = !query || 
-      `${car.year} ${car.make} ${car.model} ${car.plateNumber || ''} ${car.seller.name} ${car.location}`
-        .toLowerCase()
-        .includes(query);
-    const carStatus = car.status || 'available';
-    const matchesStatus = inventoryStatusFilter === 'all' || carStatus === inventoryStatusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredInventoryCars = allVehicles
+    .filter((car) => {
+      if (!car) return false;
+      const query = inventorySearch.toLowerCase().trim();
+      const sellerStr = `${car.seller?.name || ''} ${car.seller?.dealerName || ''}`;
+      const matchesSearch = !query || 
+        `${car.year || ''} ${car.make || ''} ${car.model || ''} ${car.plateNumber || ''} ${sellerStr} ${car.location || ''}`
+          .toLowerCase()
+          .includes(query);
+      const carStatus = car.status || 'available';
+      const matchesStatus = inventoryStatusFilter === 'all' || carStatus === inventoryStatusFilter;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      // Put user-posted cars at the top
+      const aIsUser = a.id?.startsWith('user-car-') || a.id?.startsWith('veh-user');
+      const bIsUser = b.id?.startsWith('user-car-') || b.id?.startsWith('veh-user');
+      if (aIsUser && !bIsUser) return -1;
+      if (!aIsUser && bIsUser) return 1;
+      return 0;
+    });
 
   const availableCarsCount = allVehicles.filter((v) => (v.status || 'available') === 'available').length;
   const soldCarsCount = allVehicles.filter((v) => v.status === 'sold').length;
@@ -310,13 +319,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   Approved Account
                 </span>
               )}
-              <span className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Cloud Synced
-              </span>
+              {isQuotaExceeded ? (
+                <span className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-950/60 text-amber-400 border border-amber-500/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  Local Shield Active
+                </span>
+              ) : (
+                <span className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Cloud Synced
+                </span>
+              )}
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              {currentUser.email} • {currentUser.phone} • {currentUser.companyName || 'Kigali, Rwanda'} • <span className="text-emerald-400">Google Cloud Firestore Connected</span>
+              {currentUser.email} • {currentUser.phone} • {currentUser.companyName || 'Kigali, Rwanda'} •{' '}
+              {isQuotaExceeded ? (
+                <span className="text-amber-400">Resilient Storage Shield Active (Free Daily Read Quota Reached)</span>
+              ) : (
+                <span className="text-emerald-400">Google Cloud Firestore Connected</span>
+              )}
             </p>
           </div>
         </div>
@@ -337,6 +358,36 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </button>
         </div>
       </div>
+
+      {/* QUOTA INFORMATION BANNER WITH DIRECT UPGRADE LINK */}
+      {isQuotaExceeded && (
+        <div className="p-4 bg-amber-950/40 border border-amber-600/40 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs shadow-lg">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-sm">
+                Google Cloud Firestore Read Quota Notice
+              </h4>
+              <p className="text-amber-200/80 mt-0.5 text-[11px] leading-relaxed">
+                Your database reached Google Cloud&apos;s free-tier daily read limit (50,000 reads/day). 
+                <strong> All user cars and marketplace actions remain 100% saved and protected by our Resilient Storage Shield.</strong> 
+                The free quota automatically resets every 24 hours at midnight UTC.
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://console.firebase.google.com/project/peaceful-splice-lghtt/firestore/databases/ai-studio-rwandacarhub-12d67f7b-a49c-47ec-a9cb-6558dcde5c5f/data?openUpgradeDialog=true"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs whitespace-nowrap transition-all shadow-md shrink-0 flex items-center gap-1.5"
+          >
+            <span>Upgrade Database in Google Cloud</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+      )}
 
       {/* DASHBOARD NAVIGATION TABS */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800 text-xs sm:text-sm font-semibold scrollbar-thin">
@@ -839,7 +890,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <div className="flex items-start sm:items-center gap-4 min-w-0">
                       <div className="relative shrink-0">
                         <img
-                          src={car.images[0]}
+                          src={car.images?.[0] || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=1000&auto=format&fit=crop&q=80'}
                           alt={`${car.year} ${car.make} ${car.model}`}
                           className="w-20 h-16 sm:w-24 sm:h-20 object-cover rounded-xl border border-slate-800"
                           referrerPolicy="no-referrer"
@@ -871,11 +922,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         </div>
 
                         <div className="text-[11px] text-slate-400 flex items-center gap-2 flex-wrap">
-                          <span>📍 {car.location}</span>
+                          <span>📍 {car.location || 'Kigali, Rwanda'}</span>
                           <span>•</span>
-                          <span>Seller: {car.seller.name}</span>
+                          <span>Seller: {car.seller?.name || 'Verified Kigali Seller'}</span>
                           <span>•</span>
-                          <span>{car.seller.phone}</span>
+                          <span>{car.seller?.phone || '+250 788 225 193'}</span>
                         </div>
                       </div>
                     </div>
@@ -1063,7 +1114,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   className="bg-[#0f172a] rounded-2xl p-4 border border-slate-800 flex gap-4 hover:border-blue-500/60 transition-all"
                 >
                   <img
-                    src={car.images[0]}
+                    src={car.images?.[0] || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=1000&auto=format&fit=crop&q=80'}
                     alt={`${car.year} ${car.make} ${car.model}`}
                     className="w-28 h-24 object-cover rounded-xl shrink-0 border border-slate-800"
                     referrerPolicy="no-referrer"

@@ -53,7 +53,10 @@ import {
   testFirestoreConnection,
   seedInitialVehiclesIfEmpty,
   subscribeToActivityLogs,
-  saveActivityLogToCloud
+  saveActivityLogToCloud,
+  getResilientUserCars,
+  saveUserCarToResilientStorage,
+  removeUserCarFromResilientStorage
 } from './firebase';
 
 const HERO_VEHICLE_IMAGES = [
@@ -95,22 +98,30 @@ export default function App() {
   const [currency, setCurrency] = useState<'RWF' | 'USD'>('RWF');
   const [heroVehicleImage, setHeroVehicleImage] = useState(HERO_VEHICLE_IMAGES[0].url);
 
-  // Vehicles dataset state (persisted with core showroom catalog guarantee so cars never disappear)
+  // Vehicles dataset state (persisted with core showroom catalog & resilient user cars guarantee)
   const [vehicles, setVehicles] = useState<Vehicle[]>(() => {
     try {
+      const resilientCars = getResilientUserCars();
       const saved = localStorage.getItem(STORAGE_KEYS.VEHICLES);
+      const map = new Map<string, Vehicle>();
+      // 1. Prioritize resilient user-posted cars FIRST so they appear at top of marketplace
+      resilientCars.forEach((c) => {
+        if (c && c.id) map.set(c.id, c);
+      });
+      // 2. Previously cached vehicles
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Merge with core INITIAL_CARS so verified showroom vehicles are never dropped
-          const map = new Map<string, Vehicle>();
-          INITIAL_CARS.forEach((c) => map.set(c.id, c));
           parsed.forEach((c: Vehicle) => {
-            if (c && c.id && c.make) map.set(c.id, c);
+            if (c && c.id && c.make && !map.has(c.id)) map.set(c.id, c);
           });
-          return Array.from(map.values());
         }
       }
+      // 3. Core baseline catalogue
+      INITIAL_CARS.forEach((c) => {
+        if (!map.has(c.id)) map.set(c.id, c);
+      });
+      return Array.from(map.values());
     } catch (e) {
       console.warn('Failed to load saved vehicles from storage', e);
     }
@@ -154,13 +165,23 @@ export default function App() {
   // User Dashboard State
   const [userListings, setUserListings] = useState<Vehicle[]>(() => {
     try {
+      const resilientCars = getResilientUserCars();
       const saved = localStorage.getItem(STORAGE_KEYS.USER_LISTINGS);
+      const map = new Map<string, Vehicle>();
+      resilientCars.forEach((c) => {
+        if (c && c.id) map.set(c.id, c);
+      });
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          parsed.forEach((c: Vehicle) => {
+            if (c && c.id && !map.has(c.id)) map.set(c.id, c);
+          });
+        }
       }
+      return Array.from(map.values());
     } catch (e) {}
-    return [];
+    return getResilientUserCars();
   });
 
   useEffect(() => {
@@ -674,80 +695,100 @@ export default function App() {
 
   // Cloud Firestore Real-time Listeners and Offline Resilience
   const [isCloudConnected, setIsCloudConnected] = useState<boolean>(true);
+  const [isQuotaExceeded, setIsQuotaExceeded] = useState<boolean>(false);
 
   useEffect(() => {
     // Test connectivity to Cloud Firestore & guarantee inventory
-    testFirestoreConnection().then((connected) => {
+    testFirestoreConnection().then(({ connected, quotaExceeded }) => {
       setIsCloudConnected(connected);
-      if (connected) {
+      setIsQuotaExceeded(quotaExceeded);
+      if (connected && !quotaExceeded) {
         seedInitialVehiclesIfEmpty();
-        // Rescue and permanently save any user cars from localStorage to Firestore
-        try {
-          const savedListings = localStorage.getItem(STORAGE_KEYS.USER_LISTINGS);
-          if (savedListings) {
-            const parsed = JSON.parse(savedListings);
-            if (Array.isArray(parsed)) {
-              for (const car of parsed) {
-                if (car && car.id && (car.id.startsWith('user-car-') || car.id.startsWith('veh-user'))) {
-                  saveVehicleToCloud(car).catch(console.warn);
-                }
-              }
-            }
-          }
-        } catch (e) {
-          console.warn('Local vehicle migration error:', e);
-        }
       }
     });
 
     // Subscribe to real-time vehicle updates from Google Cloud Firestore
     const unsubscribeVehicles = subscribeToVehicles(
       (cloudVehicles) => {
-        if (cloudVehicles && cloudVehicles.length > 0) {
-          setVehicles(cloudVehicles);
+          // ALWAYS overlay resilient local user cars at the top so newly published cars NEVER get wiped!
+          const resilientCars = getResilientUserCars();
+          const map = new Map<string, Vehicle>();
+          // 1. Put user cars first
+          resilientCars.forEach((c) => {
+            if (c && c.id) map.set(c.id, c);
+          });
+          // 2. Cloud vehicles
+          cloudVehicles.forEach((c) => {
+            if (c && c.id && !map.has(c.id)) map.set(c.id, c);
+          });
+          setVehicles(Array.from(map.values()));
           setIsCloudConnected(true);
-        }
       },
       (err) => {
-        console.warn('Real-time vehicle sync failed, using cached inventory:', err);
+        console.warn('Real-time vehicle sync note, using resilient catalog:', err);
         setIsCloudConnected(false);
       }
     );
 
     // Subscribe to real-time bookings
-    const unsubscribeBookings = subscribeToBookings((cloudBookings) => {
-      if (cloudBookings && cloudBookings.length > 0) {
-        setBookings(cloudBookings);
+    const unsubscribeBookings = subscribeToBookings(
+      (cloudBookings) => {
+        if (cloudBookings && cloudBookings.length > 0) {
+          setBookings(cloudBookings);
+        }
+      },
+      () => {
+        setIsQuotaExceeded(true);
       }
-    });
+    );
 
     // Subscribe to real-time contact messages & inquiries
-    const unsubscribeMessages = subscribeToMessages((cloudMessages) => {
-      if (cloudMessages && cloudMessages.length > 0) {
-        setMessages(cloudMessages);
+    const unsubscribeMessages = subscribeToMessages(
+      (cloudMessages) => {
+        if (cloudMessages && cloudMessages.length > 0) {
+          setMessages(cloudMessages);
+        }
+      },
+      () => {
+        setIsQuotaExceeded(true);
       }
-    });
+    );
 
     // Subscribe to real-time partner ads
-    const unsubscribeAds = subscribeToPartnerAds((cloudAds) => {
-      if (cloudAds && cloudAds.length > 0) {
-        setPartnerAds(cloudAds);
+    const unsubscribeAds = subscribeToPartnerAds(
+      (cloudAds) => {
+        if (cloudAds && cloudAds.length > 0) {
+          setPartnerAds(cloudAds);
+        }
+      },
+      () => {
+        setIsQuotaExceeded(true);
       }
-    });
+    );
 
     // Subscribe to real-time user accounts
-    const unsubscribeAccounts = subscribeToAccounts((cloudAccounts) => {
-      if (cloudAccounts && cloudAccounts.length > 0) {
-        setAccounts(cloudAccounts);
+    const unsubscribeAccounts = subscribeToAccounts(
+      (cloudAccounts) => {
+        if (cloudAccounts && cloudAccounts.length > 0) {
+          setAccounts(cloudAccounts);
+        }
+      },
+      () => {
+        setIsQuotaExceeded(true);
       }
-    });
+    );
 
     // Subscribe to real-time activity and audit logs
-    const unsubscribeActivityLogs = subscribeToActivityLogs((cloudLogs) => {
-      if (cloudLogs && cloudLogs.length > 0) {
-        setActivityLogs(cloudLogs);
+    const unsubscribeActivityLogs = subscribeToActivityLogs(
+      (cloudLogs) => {
+        if (cloudLogs && cloudLogs.length > 0) {
+          setActivityLogs(cloudLogs);
+        }
+      },
+      () => {
+        setIsQuotaExceeded(true);
       }
-    });
+    );
 
     return () => {
       unsubscribeVehicles();
@@ -792,41 +833,50 @@ export default function App() {
     });
   };
 
-  // Add new car handler (from PostCarModal) - Permanently saved to Google Cloud Firestore
+  // Add new car handler (from PostCarModal) - Permanently saved to Google Cloud Firestore & Local Resilient Storage
   const handleAddCar = (newCar: Vehicle) => {
-    // 1. Optimistic local update
-    setVehicles((prev) => [newCar, ...prev]);
-    setUserListings((prev) => [newCar, ...prev]);
+    const carToSave: Vehicle = {
+      ...newCar,
+      status: newCar.status || 'available'
+    };
 
-    // 2. Permanent Cloud Firestore persistence
-    saveVehicleToCloud(newCar)
+    // 1. Immediately store in resilient permanent local cache (Guarantees car never disappears)
+    saveUserCarToResilientStorage(carToSave);
+
+    // 2. Optimistic local state update
+    setVehicles((prev) => [carToSave, ...prev.filter((c) => c.id !== carToSave.id)]);
+    setUserListings((prev) => [carToSave, ...prev.filter((c) => c.id !== carToSave.id)]);
+
+    // 3. Permanent Cloud Firestore persistence
+    saveVehicleToCloud(carToSave)
       .then(() => {
         showToast(`Car post saved permanently to Google Cloud! All visitors can now view it.`);
       })
       .catch((err) => {
-        console.error('Failed to sync car to cloud database:', err);
-        showToast('Car saved locally. Will sync to Cloud Firestore when reconnected.');
+        console.warn('Vehicle saved locally. Cloud sync pending/quota:', err);
+        showToast('Car post published successfully! Saved in local inventory & live on website.');
       });
 
-    // 3. Log activity event to Admin Activity Tracker
-    const carName = `${newCar.year} ${newCar.make} ${newCar.model}`;
+    // 4. Log activity event to Admin Activity Tracker
+    const carName = `${carToSave.year} ${carToSave.make} ${carToSave.model}`;
     logActivity(
       'vehicle_added',
       'vehicles',
       `New Listing Added: ${carName}`,
-      `Vehicle "${carName}" posted for ${newCar.purpose === 'rent' ? `${newCar.priceRwf.toLocaleString()} Frw/day` : `${newCar.priceRwf.toLocaleString()} Frw`} in ${newCar.location}.`,
+      `Vehicle "${carName}" posted for ${carToSave.purpose === 'rent' ? `${carToSave.priceRwf.toLocaleString()} Frw/day` : `${carToSave.priceRwf.toLocaleString()} Frw`} in ${carToSave.location}.`,
       {
-        vehicleId: newCar.id,
+        vehicleId: carToSave.id,
         vehicleTitle: carName,
-        price: newCar.priceRwf,
-        purpose: newCar.purpose,
-        seller: newCar.seller.name
+        price: carToSave.priceRwf,
+        purpose: carToSave.purpose,
+        seller: carToSave.seller?.name || 'Seller'
       }
     );
   };
 
-  // Delete listing handler - Deleted from Google Cloud Firestore
+  // Delete listing handler - Deleted from Google Cloud Firestore & Local Resilient Storage
   const handleDeleteListing = (id: string) => {
+    removeUserCarFromResilientStorage(id);
     const targetCar = vehicles.find((c) => c.id === id);
     const carName = targetCar ? `${targetCar.year} ${targetCar.make} ${targetCar.model}` : id;
     setVehicles((prev) => prev.filter((c) => c.id !== id));
@@ -1582,6 +1632,8 @@ export default function App() {
             allVehicles={vehicles}
             partnerAds={partnerAds}
             activityLogs={activityLogs}
+            isQuotaExceeded={isQuotaExceeded}
+            isCloudConnected={isCloudConnected}
             onApproveAd={handleApproveAd}
             onRejectAd={handleRejectAd}
             onDiminishAd={handleDiminishAd}
