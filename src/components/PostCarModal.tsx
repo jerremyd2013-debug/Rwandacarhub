@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Vehicle, ListingPricingPlan, UserAccount } from '../types';
 import { LISTING_PRICING_PLANS, ADMIN_UNLIMITED_PLAN } from '../data/cars';
+import { CAR_MAKES, RWANDA_LOCATIONS } from '../data/carConstants';
 
 interface PostCarModalProps {
   isOpen: boolean;
@@ -73,7 +74,7 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
   const [fuelType, setFuelType] = useState<'Petrol' | 'Diesel' | 'Hybrid' | 'Electric'>('Petrol');
   const [bodyType, setBodyType] = useState<'SUV' | 'Sedan' | 'Pickup Truck' | 'Hatchback' | 'Van / Bus' | 'Luxury'>('SUV');
   const [condition, setCondition] = useState<'Brand New' | 'Foreign Used' | 'Local Used'>('Foreign Used');
-  const [location, setLocation] = useState('Kigali, Kicukiro');
+  const [location, setLocation] = useState(RWANDA_LOCATIONS[0].value);
   const [sellerName, setSellerName] = useState(currentUser?.name || '');
   const [sellerPhone, setSellerPhone] = useState(currentUser?.phone || '+250 788 225 193');
   const [description, setDescription] = useState('');
@@ -658,22 +659,15 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
               {/* Grid 1: Make, Model, Year, Body Type */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Make *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Make / Brand *</label>
                   <select
                     value={make}
                     onChange={(e) => setMake(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500 font-medium"
                   >
-                    <option value="Toyota">Toyota</option>
-                    <option value="Mercedes-Benz">Mercedes-Benz</option>
-                    <option value="Hyundai">Hyundai</option>
-                    <option value="Suzuki">Suzuki</option>
-                    <option value="BMW">BMW</option>
-                    <option value="Nissan">Nissan</option>
-                    <option value="Land Rover">Land Rover</option>
-                    <option value="BYD">BYD (Electric)</option>
-                    <option value="Mitsubishi">Mitsubishi</option>
-                    <option value="Volkswagen">Volkswagen</option>
+                    {CAR_MAKES.map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -791,18 +785,17 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Kigali Location *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Location in Rwanda *</label>
                   <select
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500 font-medium"
                   >
-                    <option value="Kigali, Kicukiro (Sonatubes)">Kicukiro (Sonatubes)</option>
-                    <option value="Kigali, Gasabo (Remera)">Gasabo (Remera)</option>
-                    <option value="Kigali, Gasabo (Nyarutarama)">Gasabo (Nyarutarama)</option>
-                    <option value="Kigali, Gasabo (Gisozi)">Gasabo (Gisozi)</option>
-                    <option value="Kigali, Nyarugenge (Downtown)">Nyarugenge (Downtown)</option>
-                    <option value="Kigali, Kimihurura">Kimihurura</option>
+                    {RWANDA_LOCATIONS.map((loc) => (
+                      <option key={loc.value} value={loc.value}>
+                        {loc.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

@@ -627,5 +627,48 @@ export const INITIAL_CARS: Vehicle[] = [
     description: 'Leading Rwanda’s green transportation revolution! Benefit from 0% import duty and 0% VAT incentives for EVs in Rwanda. Charge cheaply at home or at Kigali EV charging stations.',
     isFeatured: true,
     postedDate: '2026-09-04'
+  },
+  {
+    id: 'veh-013',
+    make: 'Audi',
+    model: 'Q7 55 TFSI Quattro S-Line (7-Seater)',
+    year: 2022,
+    priceRwf: 68000000,
+    priceUsd: 49275,
+    purpose: 'buy',
+    mileageKm: 32000,
+    transmission: 'Automatic',
+    fuelType: 'Petrol',
+    engineSize: '3.0L V6 Turbocharged (335 HP)',
+    bodyType: 'Luxury',
+    color: 'Mythos Black Metallic',
+    location: 'Kigali, Gacuriro (Gasabo)',
+    condition: 'Foreign Used',
+    seller: {
+      name: 'Kigali Prestige Motors',
+      phone: '+250 788 225 193',
+      whatsapp: '+250 788 225 193',
+      email: 'prestige@rwandacarhub.com',
+      isVerified: true,
+      rating: 4.9,
+      reviewCount: 31,
+      dealerName: 'Kigali Prestige Imports'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=1000&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=1000&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=1000&auto=format&fit=crop&q=80'
+    ],
+    features: [
+      'Audi Quattro Permanent All-Wheel Drive',
+      'Audi Virtual Cockpit Plus (12.3-inch Digital Display)',
+      'Panoramic Sunroof & 7-Seater Executive Cabin',
+      'Bang & Olufsen 3D Premium Sound System',
+      'Matrix LED Headlights & Dynamic Turn Signals',
+      'Control Technique Passed & Full RRA Tax Paid'
+    ],
+    description: 'Prestigious German executive luxury SUV. Exceptional high-speed stability on Kigali highways and Rwanda touring roads. Equipped with Quattro permanent AWD for rainy seasons, 7 seats, and top-tier comfort.',
+    isFeatured: true,
+    postedDate: '2026-09-08'
   }
 ];

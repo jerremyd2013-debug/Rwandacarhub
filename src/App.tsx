@@ -36,6 +36,7 @@ import { ContactView } from './components/ContactView';
 import { AuthModal } from './components/AuthModal';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { PartnersAdBanner } from './components/PartnersAdBanner';
+import { CarBrandsShowcase } from './components/CarBrandsShowcase';
 import { 
   subscribeToVehicles, 
   saveVehicleToCloud, 
@@ -1039,6 +1040,16 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Filter vehicles by brand (from CarBrandsShowcase)
+  const handleSelectBrand = (brandName: string) => {
+    setCurrentTab('buy');
+    setFilters({
+      ...initialFilters,
+      make: brandName
+    });
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  };
+
   // Filtered vehicles calculation with defensive null-safety
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((car) => {
@@ -1652,6 +1663,11 @@ export default function App() {
             onOpenAuthModal={() => setIsAuthModalOpen(true)}
             onSimulateLogin={(acc) => handleSelectUser(acc)}
           />
+        )}
+
+        {/* ======================= CAR BRANDS AND LOGOS AT BOTTOM ======================= */}
+        {currentTab !== 'dashboard' && (
+          <CarBrandsShowcase onSelectBrand={handleSelectBrand} />
         )}
       </main>
 

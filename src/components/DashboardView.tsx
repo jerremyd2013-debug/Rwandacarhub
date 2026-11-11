@@ -31,6 +31,8 @@ import { Vehicle, ContactMessage, Booking, UserAccount, VehicleStatus, PartnerAd
 import { formatPrice } from '../utils/formatters';
 import { AdminAdvertsManager } from './AdminAdvertsManager';
 import { AdminActivityLog } from './AdminActivityLog';
+import { CAR_MAKES, RWANDA_LOCATIONS } from '../data/carConstants';
+import { CarBrandsShowcase } from './CarBrandsShowcase';
 
 interface DashboardViewProps {
   favoriteVehicles: Vehicle[];
@@ -105,6 +107,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   
   const [inventorySearch, setInventorySearch] = useState('');
   const [inventoryStatusFilter, setInventoryStatusFilter] = useState<'all' | 'available' | 'sold' | 'rented' | 'leased'>('all');
+  const [inventoryMakeFilter, setInventoryMakeFilter] = useState<string>('all');
+  const [inventoryLocationFilter, setInventoryLocationFilter] = useState<string>('all');
   const [replyText, setReplyText] = useState('');
   const [replySentNotice, setReplySentNotice] = useState(false);
   const [approvalFilter, setApprovalFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
@@ -279,7 +283,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           .includes(query);
       const carStatus = car.status || 'available';
       const matchesStatus = inventoryStatusFilter === 'all' || carStatus === inventoryStatusFilter;
-      return matchesSearch && matchesStatus;
+      const matchesMake = inventoryMakeFilter === 'all' || (car.make || '').toLowerCase() === inventoryMakeFilter.toLowerCase();
+      const matchesLocation = inventoryLocationFilter === 'all' || (car.location || '').toLowerCase().includes(inventoryLocationFilter.toLowerCase());
+      return matchesSearch && matchesStatus && matchesMake && matchesLocation;
     })
     .sort((a, b) => {
       // Put user-posted cars at the top
@@ -839,19 +845,63 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* SEARCH & FILTER CONTROLS */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-              <div className="relative w-full sm:w-80">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search car, model, plate (e.g. RAD 123 B), seller..."
-                  value={inventorySearch}
-                  onChange={(e) => setInventorySearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-[#0a0f1d] border border-slate-800 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
-                />
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1">
+                {/* Text search */}
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search car, model, plate (e.g. RAD 123 B), seller..."
+                    value={inventorySearch}
+                    onChange={(e) => setInventorySearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-[#0a0f1d] border border-slate-800 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Make filter */}
+                <select
+                  value={inventoryMakeFilter}
+                  onChange={(e) => setInventoryMakeFilter(e.target.value)}
+                  className="px-3 py-2 bg-[#0a0f1d] border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 cursor-pointer font-medium"
+                  aria-label="Filter by Car Make"
+                >
+                  <option value="all">All Makes ({CAR_MAKES.length})</option>
+                  {CAR_MAKES.map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+
+                {/* Location filter */}
+                <select
+                  value={inventoryLocationFilter}
+                  onChange={(e) => setInventoryLocationFilter(e.target.value)}
+                  className="px-3 py-2 bg-[#0a0f1d] border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 cursor-pointer font-medium"
+                  aria-label="Filter by Rwanda Location"
+                >
+                  <option value="all">All Locations ({RWANDA_LOCATIONS.length})</option>
+                  {RWANDA_LOCATIONS.map((loc) => (
+                    <option key={loc.value} value={loc.label.split(' ')[0]}>
+                      {loc.label}
+                    </option>
+                  ))}
+                </select>
+
+                {(inventorySearch || inventoryMakeFilter !== 'all' || inventoryLocationFilter !== 'all') && (
+                  <button
+                    onClick={() => {
+                      setInventorySearch('');
+                      setInventoryMakeFilter('all');
+                      setInventoryLocationFilter('all');
+                    }}
+                    className="px-2.5 py-1.5 text-xs text-blue-400 hover:text-blue-300 font-semibold"
+                  >
+                    Reset
+                  </button>
+                )}
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+              <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0">
                 {(['all', 'available', 'sold', 'rented', 'leased'] as const).map((st) => (
                   <button
                     key={st}
@@ -862,7 +912,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         : 'bg-[#0a0f1d] text-slate-400 hover:text-white border border-slate-800'
                     }`}
                   >
-                    {st === 'all' ? 'All' : st}
+                    {st === 'all' ? 'All Status' : st}
                   </button>
                 ))}
               </div>
@@ -1383,6 +1433,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* ==================== AT THE BOTTOM: CAR BRANDS AND LOGOS ==================== */}
+      <div className="pt-6">
+        <CarBrandsShowcase 
+          onSelectBrand={(brand) => {
+            setActiveTab('inventory');
+            setInventoryMakeFilter(brand);
+            const el = document.getElementById('tab-admin-inventory');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          }}
+        />
+      </div>
     </div>
   );
 };

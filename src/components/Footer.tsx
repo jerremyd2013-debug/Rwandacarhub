@@ -199,6 +199,27 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectTab, onOpenP
                   Car Valuation & Pre-Inspection
                 </button>
               </li>
+              <li>
+                <button 
+                  onClick={() => {
+                    const el = document.getElementById('car-brands-and-logos-section');
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                      handleNav('home');
+                      setTimeout(() => {
+                        document.getElementById('car-brands-and-logos-section')?.scrollIntoView({ behavior: 'smooth' });
+                      }, 200);
+                    }
+                  }} 
+                  className="hover:text-white transition-colors flex items-center gap-1.5 text-blue-400 font-medium"
+                >
+                  <span>Car Brands & Logos</span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 bg-blue-950 text-blue-400 rounded border border-blue-900/60">
+                    22+
+                  </span>
+                </button>
+              </li>
             </ul>
           </div>
 

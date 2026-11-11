@@ -13,6 +13,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { FilterState, VehiclePurpose } from '../types';
+import { CAR_MAKES, RWANDA_LOCATIONS } from '../data/carConstants';
 
 interface SearchFiltersProps {
   filters: FilterState;
@@ -48,12 +49,21 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
 
   // Top popular makes in Rwanda for quick scroll pills
   const popularMakes = useMemo(() => {
-    const defaultPopular = ['Toyota', 'Mercedes-Benz', 'Land Rover', 'Hyundai', 'Nissan', 'BMW', 'BYD'];
-    const list = ['All Makes', ...defaultPopular.filter(m => availableMakes.includes(m))];
+    const defaultPopular = [
+      'Toyota', 'Mercedes-Benz', 'Audi', 'BMW', 'Mazda', 'Subaru', 'Ford', 'Tesla',
+      'Kia', 'Genesis', 'Citroën', 'Peugeot', 'Geely', 'Nio', 'Xpeng',
+      'Hyundai', 'Land Rover', 'Nissan', 'BYD', 'Volkswagen'
+    ];
+    const list = ['All Makes', ...defaultPopular];
     availableMakes.forEach(m => {
       if (!list.includes(m)) list.push(m);
     });
     return list;
+  }, [availableMakes]);
+
+  const allAvailableMakes = useMemo(() => {
+    const set = new Set<string>([...CAR_MAKES, ...availableMakes]);
+    return Array.from(set);
   }, [availableMakes]);
 
   return (
@@ -209,7 +219,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
                 className="w-full px-3 py-2.5 bg-[#0a0f1d] border border-slate-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500"
               >
                 <option value="">All Makes</option>
-                {availableMakes.map((mk) => (
+                {allAvailableMakes.map((mk) => (
                   <option key={mk} value={mk}>{mk}</option>
                 ))}
               </select>
@@ -235,19 +245,18 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
 
             {/* Location */}
             <div>
-              <label className="block text-[11px] font-semibold text-slate-400 mb-1">Kigali Location</label>
+              <label className="block text-[11px] font-semibold text-slate-400 mb-1">Rwanda Location</label>
               <select
                 value={filters.location}
                 onChange={(e) => onFilterChange({ location: e.target.value })}
                 className="w-full px-3 py-2.5 bg-[#0a0f1d] border border-slate-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500"
               >
-                <option value="">All Kigali Locations</option>
-                <option value="Kicukiro">Kicukiro</option>
-                <option value="Gasabo">Gasabo</option>
-                <option value="Nyarugenge">Nyarugenge</option>
-                <option value="Remera">Remera</option>
-                <option value="Gisozi">Gisozi</option>
-                <option value="Kimihurura">Kimihurura</option>
+                <option value="">All Rwanda Locations</option>
+                {RWANDA_LOCATIONS.map((loc) => (
+                  <option key={loc.value} value={loc.label.split(' ')[0]}>
+                    {loc.label}
+                  </option>
+                ))}
               </select>
             </div>
 
