@@ -1090,6 +1090,13 @@ export default function App() {
           return false;
         }
       }
+      // Year of Fabrication filter (1990 - 2030)
+      if (filters.minYear && car.year && car.year < filters.minYear) {
+        return false;
+      }
+      if (filters.maxYear && car.year && car.year > filters.maxYear) {
+        return false;
+      }
       // Search query filter (search make, model, location, seller, features)
       if (filters.searchQuery) {
         const query = filters.searchQuery.toLowerCase().trim();

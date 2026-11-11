@@ -40,6 +40,12 @@ export const CAR_MAKES: string[] = [
   'Isuzu'
 ];
 
+// User-requested Year of Fabrication range: 1990 - 2030
+export const FABRICATION_YEARS: number[] = Array.from(
+  { length: 2030 - 1990 + 1 },
+  (_, i) => 2030 - i
+);
+
 // User-requested locations in Rwanda:
 // Gikondo, Gisozi, Gatsata, Gatenga, Gacuriro, Kanombe, Kabuga, Kagugu, Kibagabaga, 
 // Kimironko, Kimisagara, Rebero, Rusororo, Nyamirambo, Nyabugogo, Nyamata, Kamonyi, 

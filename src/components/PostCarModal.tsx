@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { Vehicle, ListingPricingPlan, UserAccount } from '../types';
 import { LISTING_PRICING_PLANS, ADMIN_UNLIMITED_PLAN } from '../data/cars';
-import { CAR_MAKES, RWANDA_LOCATIONS } from '../data/carConstants';
+import { CAR_MAKES, RWANDA_LOCATIONS, FABRICATION_YEARS } from '../data/carConstants';
 
 interface PostCarModalProps {
   isOpen: boolean;
@@ -685,14 +685,19 @@ export const PostCarModal: React.FC<PostCarModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Year *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    Year of Fabrication * (1990 - 2030)
+                  </label>
                   <select
                     value={year}
                     onChange={(e) => setYear(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-[#0a0f1d] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500 font-medium"
+                    aria-label="Year of Fabrication (1990 - 2030)"
                   >
-                    {[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015].map((yr) => (
-                      <option key={yr} value={yr}>{yr}</option>
+                    {FABRICATION_YEARS.map((yr) => (
+                      <option key={yr} value={yr}>
+                        {yr}
+                      </option>
                     ))}
                   </select>
                 </div>

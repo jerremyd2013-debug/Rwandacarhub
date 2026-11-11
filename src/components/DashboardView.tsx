@@ -31,7 +31,7 @@ import { Vehicle, ContactMessage, Booking, UserAccount, VehicleStatus, PartnerAd
 import { formatPrice } from '../utils/formatters';
 import { AdminAdvertsManager } from './AdminAdvertsManager';
 import { AdminActivityLog } from './AdminActivityLog';
-import { CAR_MAKES, RWANDA_LOCATIONS } from '../data/carConstants';
+import { CAR_MAKES, RWANDA_LOCATIONS, FABRICATION_YEARS } from '../data/carConstants';
 import { CarBrandsShowcase } from './CarBrandsShowcase';
 
 interface DashboardViewProps {
@@ -109,6 +109,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [inventoryStatusFilter, setInventoryStatusFilter] = useState<'all' | 'available' | 'sold' | 'rented' | 'leased'>('all');
   const [inventoryMakeFilter, setInventoryMakeFilter] = useState<string>('all');
   const [inventoryLocationFilter, setInventoryLocationFilter] = useState<string>('all');
+  const [inventoryYearFilter, setInventoryYearFilter] = useState<string>('all');
   const [replyText, setReplyText] = useState('');
   const [replySentNotice, setReplySentNotice] = useState(false);
   const [approvalFilter, setApprovalFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
@@ -285,7 +286,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       const matchesStatus = inventoryStatusFilter === 'all' || carStatus === inventoryStatusFilter;
       const matchesMake = inventoryMakeFilter === 'all' || (car.make || '').toLowerCase() === inventoryMakeFilter.toLowerCase();
       const matchesLocation = inventoryLocationFilter === 'all' || (car.location || '').toLowerCase().includes(inventoryLocationFilter.toLowerCase());
-      return matchesSearch && matchesStatus && matchesMake && matchesLocation;
+      const matchesYear = inventoryYearFilter === 'all' || (car.year ? String(car.year) === inventoryYearFilter : false);
+      return matchesSearch && matchesStatus && matchesMake && matchesLocation && matchesYear;
     })
     .sort((a, b) => {
       // Put user-posted cars at the top
@@ -887,12 +889,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   ))}
                 </select>
 
-                {(inventorySearch || inventoryMakeFilter !== 'all' || inventoryLocationFilter !== 'all') && (
+                {/* Year of Fabrication filter (1990 - 2030) */}
+                <select
+                  value={inventoryYearFilter}
+                  onChange={(e) => setInventoryYearFilter(e.target.value)}
+                  className="px-3 py-2 bg-[#0a0f1d] border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 cursor-pointer font-medium"
+                  aria-label="Filter by Year of Fabrication (1990 - 2030)"
+                >
+                  <option value="all">All Years (1990 - 2030)</option>
+                  {FABRICATION_YEARS.map((yr) => (
+                    <option key={yr} value={String(yr)}>
+                      Year {yr}
+                    </option>
+                  ))}
+                </select>
+
+                {(inventorySearch || inventoryMakeFilter !== 'all' || inventoryLocationFilter !== 'all' || inventoryYearFilter !== 'all') && (
                   <button
                     onClick={() => {
                       setInventorySearch('');
                       setInventoryMakeFilter('all');
                       setInventoryLocationFilter('all');
+                      setInventoryYearFilter('all');
                     }}
                     className="px-2.5 py-1.5 text-xs text-blue-400 hover:text-blue-300 font-semibold"
                   >
@@ -956,6 +974,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-xs font-black text-white">
                             {car.year} {car.make} {car.model}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-950 text-blue-300 border border-blue-800/70">
+                            Fab. {car.year}
                           </span>
                           {car.plateNumber && (
                             <span className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px] text-slate-300">

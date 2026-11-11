@@ -670,5 +670,89 @@ export const INITIAL_CARS: Vehicle[] = [
     description: 'Prestigious German executive luxury SUV. Exceptional high-speed stability on Kigali highways and Rwanda touring roads. Equipped with Quattro permanent AWD for rainy seasons, 7 seats, and top-tier comfort.',
     isFeatured: true,
     postedDate: '2026-09-08'
+  },
+  {
+    id: 'veh-014',
+    make: 'Toyota',
+    model: 'Land Cruiser 100-Series 4.2D 4x4',
+    year: 1998,
+    priceRwf: 24500000,
+    priceUsd: 17750,
+    purpose: 'buy',
+    mileageKm: 210000,
+    transmission: 'Manual',
+    fuelType: 'Diesel',
+    engineSize: '4.2L 1HZ Inline-6 Diesel',
+    bodyType: 'SUV',
+    color: 'Safari Warm White',
+    location: 'Kigali, Nyamirambo (Nyarugenge)',
+    condition: 'Local Used',
+    plateNumber: 'RAE 412 G',
+    seller: {
+      name: 'Gasabo Expedition Cars',
+      phone: '+250 788 412 889',
+      whatsapp: '+250 788 412 889',
+      email: 'expeditions@rwandacarhub.com',
+      isVerified: true,
+      rating: 4.8,
+      reviewCount: 42,
+      dealerName: 'Safari Fleet Rwanda'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1000&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=1000&auto=format&fit=crop&q=80'
+    ],
+    features: [
+      'Legendary 1HZ 4.2L Naturally Aspirated Diesel Engine',
+      'Dual Fuel Tanks (145 Liters Total Long-Range Range)',
+      'Heavy-Duty Old Man Emu Suspension & Snorkel',
+      'Locking Front & Rear Differentials',
+      'Up-to-date Control Technique Rwanda'
+    ],
+    description: 'Classic 1998 legendary Toyota Land Cruiser 100. Ultimate reliability across Musanze, Nyungwe, and Akagera terrain. Flawlessly maintained engine, clean Rwanda registration, ready for immediate transfer.',
+    isFeatured: false,
+    postedDate: '2026-09-02'
+  },
+  {
+    id: 'veh-015',
+    make: 'Tesla',
+    model: 'Model Y Dual-Motor Long Range AWD',
+    year: 2026,
+    priceRwf: 64000000,
+    priceUsd: 46375,
+    purpose: 'buy',
+    mileageKm: 1200,
+    transmission: 'Automatic',
+    fuelType: 'Electric',
+    engineSize: 'Dual Electric Motors (384 HP)',
+    bodyType: 'SUV',
+    color: 'Solid Black',
+    location: 'Kigali, Kimihurura (Gasabo)',
+    condition: 'Brand New',
+    plateNumber: 'RAF 890 M',
+    seller: {
+      name: 'Kigali EV Mobility',
+      phone: '+250 788 650 330',
+      whatsapp: '+250 788 650 330',
+      email: 'ev@rwandacarhub.com',
+      isVerified: true,
+      rating: 5.0,
+      reviewCount: 19,
+      dealerName: 'Green Drive Rwanda'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=1000&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1536700503339-1e4b06520771?w=1000&auto=format&fit=crop&q=80'
+    ],
+    features: [
+      '533 km All-Electric Range on Full Charge',
+      'Dual Motor All-Wheel Drive with Off-Road Assist',
+      'Autopilot & 15-inch Touchscreen Navigation',
+      'Type 2 & CCS2 Compatible Fast Charging for Kigali Stations',
+      'Zero Emissions & Rwanda Green Transport Tax Exemption'
+    ],
+    description: 'Brand new 2026 Tesla Model Y Long Range. 100% electric luxury with exceptional acceleration and zero fuel expense in Kigali. Includes home wall connector and full local warranty.',
+    isFeatured: true,
+    postedDate: '2026-09-09'
   }
 ];
